@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* NUPAL design tokens — logo green and pestle brown, with the deep Kerala green and cream from the design. */
+@theme {
+  --color-forest: #1f3d2b;
+  --color-forest-deep: #16301f;
+  --color-sage: #567459;
+  --color-sage-dark: #3e5a42;
+  --color-leaf: #72bf44; /* logo green — decorative only, not for text on white */
+  --color-pestle: #913810; /* logo brown — prices, sale accents */
+  --color-gold: #c9a45c;
+  --color-cream: #f7f4ee;
+  --color-sand: #ece6da;
+  --color-line: #e3dccd;
+  --color-ink: #22302a;
+  --color-muted: #5e6862;
+  --color-mist: #eef2ea;
+
+  --font-display: var(--font-marcellus), Georgia, serif;
+  --font-sans: var(--font-jost), system-ui, sans-serif;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-white text-ink font-sans antialiased; }
+  h1, h2, h3 { @apply font-display font-normal; text-wrap: balance; }
+  :focus-visible { outline: 2px solid var(--color-sage); outline-offset: 2px; }
+  input, select, textarea { font: inherit; }
+}
+
+@utility container-x {
+  @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-6 h-12 text-[15px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+@utility btn-primary {
+  @apply btn bg-sage text-white hover:bg-forest;
+}
+@utility btn-gold {
+  @apply btn bg-gold text-[#1b1608] hover:bg-[#b8924a];
+}
+@utility btn-outline {
+  @apply btn border border-line bg-white text-ink hover:border-sage;
+}
+@utility field {
+  @apply h-12 w-full rounded-xl border border-[#cfc5b0] bg-white px-4 text-base outline-none focus:border-sage;
+}
+@utility label {
+  @apply text-sm font-medium;
+}
+@utility chip {
+  @apply inline-flex items-center gap-1.5 rounded-lg border px-3.5 h-10 text-sm transition-colors;
+}
+@utility a-card {
+  @apply rounded-2xl border border-[#dce5df] bg-white p-5;
+}
+@utility a-input {
+  @apply h-11 w-full rounded-lg border border-[#c9d6ce] bg-white px-3 text-[15px] outline-none focus:border-[#2e6b47];
+}
+@utility a-textarea {
+  @apply w-full rounded-lg border border-[#c9d6ce] bg-white px-3 py-2.5 text-[15px] outline-none focus:border-[#2e6b47];
+}
+@utility a-btn {
+  @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[#2e6b47] px-4 text-sm font-semibold text-white hover:bg-[#1e4a30] disabled:opacity-50;
+}
+@utility a-btn-ghost {
+  @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dce5df] bg-white px-4 text-sm font-semibold text-[#15241b] hover:border-[#2e6b47];
+}
+@utility a-btn-danger {
+  @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#f1c9be] bg-white px-4 text-sm font-semibold text-[#a3361f] hover:bg-[#fbe6e0];
+}
+@utility a-label {
+  @apply mb-1.5 block text-sm font-semibold text-[#15241b];
+}
+@utility a-help {
+  @apply mt-1 text-xs text-[#56685d];
+}
+@utility a-th {
+  @apply px-3 py-3 text-left text-[13px] font-medium text-[#56685d];
+}
+@utility a-td {
+  @apply border-t border-[#e8eeea] px-3 py-3 align-middle;
+}
+
+.prose-nupal h2 { @apply mt-8 mb-3 text-2xl; }
+.prose-nupal h3 { @apply mt-6 mb-2 text-xl; }
+.prose-nupal p { @apply my-3 leading-7 text-[#3f4a44]; }
+.prose-nupal ul { @apply my-3 list-disc pl-6 leading-7 text-[#3f4a44]; }
+.prose-nupal ol { @apply my-3 list-decimal pl-6 leading-7 text-[#3f4a44]; }
+.prose-nupal a { @apply text-sage underline; }
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee { animation: marquee 40s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+@keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.fade-in { animation: fadein .5s ease both; }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,408 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // same as DATABASE_URL locally; the unpooled URL on Neon
+}
+
+// ─── Admin users ────────────────────────────────────────────────
+
+enum Role {
+  OWNER // everything, including staff and settings
+  ADMIN // everything except staff
+  DOCTOR // consultations only
+  ORDERS // orders and customers
+  CONTENT // products, banners, pages
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(ADMIN)
+  active       Boolean  @default(true)
+  doctorId     String?  @unique
+  doctor       Doctor?  @relation(fields: [doctorId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+// ─── Catalogue ──────────────────────────────────────────────────
+
+model Concern {
+  id        String              @id @default(cuid())
+  name      String
+  slug      String              @unique
+  icon      String              @default("leaf") // key of a built-in icon
+  sortOrder Int                 @default(0)
+  active    Boolean             @default(true)
+  products  ProductOnConcern[]
+}
+
+model Product {
+  id           String             @id @default(cuid())
+  name         String
+  slug         String             @unique
+  type         String // Capsule, Syrup, Tablet, Oil, Cream & Ointment, Rasayanam & Lepam ...
+  brand        String? // e.g. MONOEXTRACTS
+  shortDesc    String             @default("")
+  description  String             @default("") // markdown
+  ingredients  String             @default("")
+  dosage       String             @default("")
+  benefits     String[]           @default([])
+  faqs         Json               @default("[]") // [{ q, a }]
+  images       String[]           @default([]) // URLs, first is the cover
+  videoUrl     String?
+  isActive     Boolean            @default(true)
+  isBestseller Boolean            @default(false)
+  sortOrder    Int                @default(0)
+  seoTitle     String?
+  seoDesc      String?
+  ratingAvg    Float              @default(0) // kept up to date from approved reviews
+  ratingCount  Int                @default(0)
+  variants     Variant[]
+  concerns     ProductOnConcern[]
+  reviews      Review[]
+  testimonials Testimonial[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model Variant {
+  id        String      @id @default(cuid())
+  productId String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label     String // "50 caps", "200 ml"
+  mrp       Int // rupees
+  price     Int // selling price in rupees (<= mrp)
+  stock     Int         @default(0)
+  sku       String?
+  sortOrder Int         @default(0)
+  orderItems OrderItem[]
+}
+
+model ProductOnConcern {
+  productId String
+  concernId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  concern   Concern @relation(fields: [concernId], references: [id], onDelete: Cascade)
+
+  @@id([productId, concernId])
+}
+
+// ─── Orders ─────────────────────────────────────────────────────
+
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  COD
+  ONLINE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  number        Int           @unique @default(autoincrement())
+  customerName  String
+  phone         String
+  email         String?
+  address       String
+  city          String
+  state         String
+  pincode       String
+  subtotal      Int
+  shipping      Int
+  codCharge     Int           @default(0)
+  total         Int
+  paymentMethod PaymentMethod @default(COD)
+  paymentStatus PaymentStatus @default(PENDING)
+  status        OrderStatus   @default(NEW)
+  notes         String?
+  items         OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId   String?
+  variant     Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  productName String
+  variantLabel String
+  price       Int
+  qty         Int
+}
+
+// ─── Doctor consultations ───────────────────────────────────────
+
+model Doctor {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  qualifications String         @default("BAMS")
+  experience     String         @default("")
+  specialities   String[]       @default([])
+  languages      String[]       @default([])
+  bio            String         @default("")
+  photo          String?
+  active         Boolean        @default(true)
+  sortOrder      Int            @default(0)
+  availability   Availability[]
+  leaves         Leave[]
+  bookings       Booking[]
+  user           User?
+}
+
+model ConsultationType {
+  id          String    @id @default(cuid())
+  key         String    @unique // video | phone | clinic
+  name        String
+  description String    @default("")
+  durationMin Int       @default(20)
+  fee         Int? // rupees; null = shown as "fee confirmed on booking"
+  active      Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  bookings    Booking[]
+}
+
+model Availability {
+  id        String @id @default(cuid())
+  doctorId  String
+  doctor    Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  weekday   Int // 0 = Sunday … 6 = Saturday
+  startMin  Int // minutes from midnight, IST
+  endMin    Int
+}
+
+model Leave {
+  id       String @id @default(cuid())
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  date     String // YYYY-MM-DD in IST
+  note     String?
+
+  @@unique([doctorId, date])
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Booking {
+  id            String           @id @default(cuid())
+  number        Int              @unique @default(autoincrement())
+  doctorId      String
+  doctor        Doctor           @relation(fields: [doctorId], references: [id])
+  typeId        String
+  type          ConsultationType @relation(fields: [typeId], references: [id])
+  startsAt      DateTime
+  durationMin   Int
+  name          String
+  phone         String
+  age           Int
+  concern       String
+  email         String?
+  notes         String?
+  fee           Int?
+  status        BookingStatus    @default(CONFIRMED)
+  paymentStatus PaymentStatus    @default(PENDING)
+  meetingLink   String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([doctorId, startsAt])
+}
+
+// ─── Site content ───────────────────────────────────────────────
+
+model Banner {
+  id           String  @id @default(cuid())
+  title        String
+  subtitle     String  @default("")
+  ctaLabel     String  @default("Shop now")
+  ctaHref      String  @default("/shop")
+  imageDesktop String?
+  imageMobile  String?
+  theme        String  @default("cream") // cream | green | brown — used when there is no image
+  active       Boolean @default(true)
+  sortOrder    Int     @default(0)
+}
+
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  content   String   @default("") // markdown
+  inFooter  Boolean  @default(true)
+  published Boolean  @default(true)
+  seoDesc   String?
+  blocks    PageBlock[]
+  updatedAt DateTime @updatedAt
+}
+
+// A section of a page. `data` depends on `type`:
+// text     { body, image?, imageSide: "left" | "right" }
+// message  { photo?, name, role, body }                       e.g. Chairman’s message
+// people   { people: [{ photo?, name, role, bio }] }          e.g. Management
+// logos    { logos: [{ image?, name, url }] }                 e.g. Our associates
+// gallery  { images: [url] }                                  e.g. certificates, CSR photos
+model PageBlock {
+  id        String @id @default(cuid())
+  pageId    String
+  page      Page   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type      String
+  title     String @default("")
+  anchor    String @default("") // section address, e.g. /about-us#management
+  data      Json   @default("{}")
+  sortOrder Int    @default(0)
+}
+
+// Dropdown menus in the header, e.g. “About us ▾”.
+model MenuGroup {
+  id        String     @id @default(cuid())
+  name      String
+  sortOrder Int        @default(0)
+  active    Boolean    @default(true)
+  items     MenuItem[]
+}
+
+model MenuItem {
+  id        String    @id @default(cuid())
+  groupId   String
+  group     MenuGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  label     String
+  href      String
+  sortOrder Int       @default(0)
+}
+
+// Single row (id = "site") holding editable site-wide settings.
+model Setting {
+  id                String   @id @default("site")
+  offerMessages     String[] @default([])
+  whatsappNumber    String   @default("")
+  phone             String   @default("")
+  email             String   @default("")
+  address           String   @default("")
+  customerCareHours String   @default("")
+  shippingFee       Int      @default(0)
+  freeShippingAbove Int?
+  codEnabled        Boolean  @default(true)
+  codCharge         Int      @default(0)
+  codMaxOrder       Int?
+  gstin             String   @default("")
+  legalName         String   @default("")
+  heroHeadline      String   @default("")
+  heroText          String   @default("")
+  instagramUrl      String   @default("")
+  facebookUrl       String   @default("")
+  youtubeUrl        String   @default("")
+  resultsCount      Int      @default(10000) // number in the “Real results” counter
+  resultsHook       String   @default("Click to see. Scroll to believe.")
+  updatedAt         DateTime @updatedAt
+}
+
+// ─── Reviews and testimonials ───────────────────────────────────
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+}
+
+model Review {
+  id        String       @id @default(cuid())
+  productId String
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  place     String       @default("")
+  phone     String? // never shown; used to mark "Verified buyer"
+  rating    Int // 1–5
+  title     String       @default("")
+  body      String
+  status    ReviewStatus @default(PENDING)
+  reply     String? // NUPAL’s public reply
+  featured  Boolean      @default(false) // shown on the homepage
+  verified  Boolean      @default(false)
+  createdAt DateTime     @default(now())
+
+  @@index([productId, status])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  place     String   @default("")
+  quote     String   @default("") // one short line shown under the video
+  videoUrl  String // YouTube link (video or Short) or a direct .mp4 link
+  thumbnail String? // optional custom cover image
+  vertical  Boolean  @default(true) // phone-style 9:16 video
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model SocialLink {
+  id        String  @id @default(cuid())
+  platform  String // facebook | instagram | youtube | x | linkedin | whatsapp
+  label     String // e.g. "NUPAL Remedies", "NUPAL Clinic"
+  url       String
+  inFooter  Boolean @default(false) // the main account for this platform, shown in every page’s footer
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+// ─── Real results (before / after photos) ───────────────────────
+
+enum ResultStatus {
+  DRAFT
+  PUBLISHED
+  HIDDEN
+}
+
+// Photos uploaded in bulk, waiting to be turned into results.
+model ResultUpload {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String
+  patientId String   @default("") // guessed from the file name, e.g. “NU 61244”
+  role      String   @default("") // before | after | "" — guessed from the file name
+  createdAt DateTime @default(now())
+}
+
+model Result {
+  id        String       @id @default(cuid())
+  patientId String
+  beforeUrl String? // pair: before + after
+  afterUrl  String?
+  imageUrl  String? // single image, e.g. a ready-made collage
+  consent   Boolean      @default(false) // customer agreed to their photos being shown
+  status    ResultStatus @default(DRAFT)
+  featured  Boolean      @default(false) // one of the 4 on the homepage
+  sortOrder Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([status, featured])
+}
