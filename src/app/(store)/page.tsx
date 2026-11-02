@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { cardInclude, toCard } from "@/lib/catalog";
@@ -43,47 +44,72 @@ export default async function HomePage() {
 
       {doctors.length > 0 && (
         <section className="relative overflow-hidden bg-forest text-cream" aria-labelledby="consult">
-          <svg viewBox="0 0 560 300" className="pointer-events-none absolute -right-10 bottom-0 w-[620px] opacity-15" aria-hidden="true">
+          <svg viewBox="0 0 560 300" className="pointer-events-none absolute -right-10 bottom-0 w-[620px] opacity-[.18]" aria-hidden="true">
             <g fill="none" stroke="#C9D4C8" strokeWidth="2">
               <path d="M40 160L280 30l240 130M10 200l90-48h360l90 48M100 200v100M180 200v100M380 200v100M460 200v100M60 300h440M230 300v-70h100v70" />
             </g>
           </svg>
-          <div className="container-x relative grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[.9fr_1.1fr]">
-            <div className="flex flex-col gap-3">
-              {doctors.map((d, i) => (
-                <Reveal key={d.id} index={i} from="left">
-                <div className="flex items-center gap-4 rounded-2xl bg-cream p-4 text-ink">
-                  <DoctorPhoto src={d.photo} name={d.name} size={72} />
-                  <div>
-                    <p className="font-display text-xl">{d.name}</p>
-                    <p className="text-sm text-muted">
-                      {d.qualifications}
-                      {d.experience ? ` · ${d.experience}` : ""}
-                    </p>
-                  </div>
-                </div>
-                </Reveal>
+          <div className="container-x relative grid items-center gap-12 py-20 sm:py-24 lg:grid-cols-2 lg:gap-14">
+            <div className="flex flex-col items-start">
+              <Reveal><p className="text-xs font-medium uppercase tracking-[.18em] text-gold">Personal guidance</p></Reveal>
+              <Reveal index={1}>
+                <h2 id="consult" className="mt-2 text-[clamp(32px,3.8vw,50px)] leading-[1.08]">
+                  Consult our
+                  <br />
+                  Ayurvedic experts
+                </h2>
+              </Reveal>
+              <Reveal index={2}>
+                <p className="mt-5 max-w-[46ch] text-lg font-light leading-8 text-[#c9d4c8]">
+                  Tell us your concern and get the right care for you — by video, phone or at our Kochi clinic. No account needed.
+                </p>
+              </Reveal>
+              <Reveal index={3}>
+                <ul className="mt-6 flex flex-wrap gap-2.5">
+                  {types.map((t) => (
+                    <li key={t.id} className="rounded-full border border-white/20 bg-white/[.06] px-4 py-2.5 text-sm">
+                      {t.name} · {t.durationMin} min
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+              <Reveal index={4}>
+                <Link href="/consult" className="btn-gold mt-8">
+                  Book a consultation
+                </Link>
+              </Reveal>
+            </div>
+            <ul className={`grid gap-4 sm:gap-5 ${doctors.length === 1 ? "max-w-xs" : "grid-cols-2"}`}>
+              {doctors.slice(0, 4).map((d, i) => (
+                <li key={d.id}>
+                  <Reveal index={i} className="h-full">
+                    <Link
+                      href="/consult"
+                      className="flex h-full flex-col overflow-hidden rounded-3xl bg-[#F7F4EE] text-ink transition-[transform,box-shadow] duration-500 hover:-translate-y-1.5 hover:shadow-[0_26px_50px_-26px_rgba(0,0,0,.6)]"
+                    >
+                      <span className={`relative block aspect-[4/5] ${i % 2 ? "bg-[#F1E7D6]" : "bg-[#E6EDE2]"}`}>
+                        {d.photo ? (
+                          // object-top keeps the face in view whatever the photo’s shape
+                          <Image src={d.photo} alt={d.name} fill sizes="(max-width: 1024px) 50vw, 300px" className="object-cover object-top" />
+                        ) : (
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <DoctorPhoto src={null} name={d.name} size={120} />
+                          </span>
+                        )}
+                      </span>
+                      <span className="flex flex-1 flex-col px-4 pb-5 pt-4 sm:px-5">
+                        <span className="font-display text-lg leading-tight sm:text-[22px]">{d.name}</span>
+                        <span className="mt-1 text-[13px] text-muted sm:text-sm">
+                          {d.qualifications}
+                          {d.experience ? ` · ${d.experience}` : " · Ayurvedic physician"}
+                        </span>
+                        {d.specialities.length > 0 && <span className="mt-2 text-[13px] text-[#8A5E12]">{d.specialities.slice(0, 3).join(" · ")}</span>}
+                      </span>
+                    </Link>
+                  </Reveal>
+                </li>
               ))}
-            </div>
-            <div className="flex flex-col items-start gap-6">
-              <h2 id="consult" className="text-[clamp(30px,3.4vw,46px)] leading-tight">
-                Talk to our Ayurvedic doctors
-              </h2>
-              <p className="max-w-[52ch] text-lg leading-8 text-[#c9d4c8]">
-                Get advice for your health concern and the right medicines for you. Pick a time that suits you — no account needed.
-              </p>
-              <ul className="flex flex-wrap gap-3">
-                {types.map((t) => (
-                  <li key={t.id} className="rounded-xl border border-white/15 bg-white/5 px-4 py-3">
-                    <span className="block font-medium">{t.name}</span>
-                    <span className="text-sm text-[#c9d4c8]">{t.durationMin} min</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/consult" className="btn-gold">
-                Book a consultation
-              </Link>
-            </div>
+            </ul>
           </div>
         </section>
       )}

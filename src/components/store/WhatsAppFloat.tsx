@@ -15,7 +15,7 @@ export function WhatsAppFloat({ number }: { number: string }) {
           </svg>
           <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#25D366]" />
         </span>
-        Talk to a doctor
+        Talk to an expert
       </Link>
       {digits && (
         <a

@@ -18,7 +18,7 @@ export function CartView({ shippingFee, freeShippingAbove }: { shippingFee: numb
         <p className="text-muted">Browse medicines by health concern, or ask our doctor what suits you.</p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link href="/shop" className="btn-primary">Browse products</Link>
-          <Link href="/consult" className="btn-outline">Consult a doctor</Link>
+          <Link href="/consult" className="btn-outline">Consult an expert</Link>
         </div>
       </div>
     );

@@ -4,12 +4,13 @@ import type { CardProduct } from "@/components/store/ProductCard";
 
 export const cardInclude = {
   variants: { orderBy: { sortOrder: "asc" } },
-  concerns: { select: { concernId: true } },
+  concerns: { select: { concernId: true, concern: { select: { name: true, sortOrder: true } } } },
 } satisfies Prisma.ProductInclude;
 
 type WithVariants = Prisma.ProductGetPayload<{ include: typeof cardInclude }>;
 
 export function toCard(p: WithVariants): CardProduct & { concernIds: string[] } {
+  const firstConcern = [...p.concerns].sort((a, b) => a.concern.sortOrder - b.concern.sortOrder)[0];
   return {
     id: p.id,
     slug: p.slug,
@@ -18,6 +19,9 @@ export function toCard(p: WithVariants): CardProduct & { concernIds: string[] } 
     brand: p.brand,
     shortDesc: p.shortDesc,
     image: p.images[0] ?? null,
+    image2: p.images[1] ?? null,
+    benefits: p.benefits.slice(0, 3),
+    concernName: firstConcern?.concern.name ?? null,
     isBestseller: p.isBestseller,
     ratingAvg: p.ratingAvg,
     ratingCount: p.ratingCount,

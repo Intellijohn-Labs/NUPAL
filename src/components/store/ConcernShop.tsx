@@ -60,7 +60,8 @@ export function ConcernShop({ products, concerns }: { products: P[]; concerns: C
       <section className="container-x scroll-mt-28 py-14 sm:py-16" aria-labelledby="shop-heading" ref={gridRef} id="bestsellers">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 id="shop-heading" className="text-[clamp(28px,3.4vw,42px)]" aria-live="polite">
+            <p className="text-xs font-medium uppercase tracking-[.18em] text-sage">{concern ? "Shop by health concern" : "Loved by our customers"}</p>
+            <h2 id="shop-heading" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight" aria-live="polite">
               {concern ? concern.name : "Bestsellers"}
             </h2>
             <p className="mt-1 text-muted">
@@ -77,7 +78,7 @@ export function ConcernShop({ products, concerns }: { products: P[]; concerns: C
         </div>
 
         {list.length > 0 ? (
-          <div key={active} className="fade-in grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+          <div key={active} className="fade-in grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-4">
             {list.map((p) => (
               <ProductCard key={p.id} p={p} />
             ))}

@@ -62,7 +62,7 @@ export function Header({ concerns, types }: { concerns: Concern[]; types: string
 
         <div className="ml-auto flex items-center gap-1 lg:ml-0">
           <Link href="/consult" className="btn-primary hidden h-10 px-4 text-sm sm:inline-flex">
-            Consult a doctor
+            Consult an expert
           </Link>
           <Link href="/cart" aria-label={`Cart, ${count} items`} className="relative flex h-11 w-11 items-center justify-center">
             <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
@@ -113,8 +113,8 @@ export function Header({ concerns, types }: { concerns: Concern[]; types: string
           <Link href="/about-us" className="py-2 lg:py-3" onClick={pick}>
             About us
           </Link>
-          <Link href="/consult" className="py-2 text-sage lg:hidden">
-            Consult a doctor
+          <Link href="/consult" className="py-2 text-sage lg:hidden" onClick={pick}>
+            Consult an expert
           </Link>
         </div>
       </nav>

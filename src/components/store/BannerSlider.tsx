@@ -40,16 +40,23 @@ export function BannerSlider({ banners }: { banners: BannerData[] }) {
     <section
       aria-roledescription="carousel"
       aria-label="Featured"
-      className={`relative overflow-hidden ${t.bg}`}
+      className={`relative overflow-hidden ${b.imageDesktop ? "pt-5 sm:pt-7" : t.bg}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       <div key={b.id} className="fade-in">
         {b.imageDesktop ? (
-          <Link href={b.ctaHref} aria-label={b.title} className={`relative block ${b.imageMobile ? "aspect-[4/5]" : "aspect-[16/6]"} sm:aspect-[16/6]`}>
-            {b.imageMobile && <Image src={b.imageMobile} alt={b.title} fill priority className="object-cover sm:hidden" sizes="100vw" />}
-            <Image src={b.imageDesktop} alt={b.title} fill priority className={`object-cover ${b.imageMobile ? "hidden sm:block" : ""}`} sizes="100vw" />
-          </Link>
+          // Image banners sit inside the page width as a rounded card with a soft shadow.
+          <div className="container-x">
+            <Link
+              href={b.ctaHref}
+              aria-label={b.title}
+              className={`relative block overflow-hidden rounded-3xl shadow-[0_28px_50px_-28px_rgba(31,61,43,.55),0_2px_8px_rgba(0,0,0,.05)] transition-transform duration-500 hover:-translate-y-0.5 ${b.imageMobile ? "aspect-[4/5]" : "aspect-[16/6]"} sm:aspect-[16/6]`}
+            >
+              {b.imageMobile && <Image src={b.imageMobile} alt={b.title} fill priority className="object-cover sm:hidden" sizes="(max-width: 640px) 100vw, 1240px" />}
+              <Image src={b.imageDesktop} alt={b.title} fill priority className={`object-cover ${b.imageMobile ? "hidden sm:block" : ""}`} sizes="(max-width: 640px) 100vw, 1240px" />
+            </Link>
+          </div>
         ) : (
           <div className="container-x grid min-h-[380px] items-center gap-8 py-14 sm:min-h-[460px] md:grid-cols-[1.1fr_.9fr]">
             <div className="flex flex-col items-start gap-5">
@@ -64,7 +71,7 @@ export function BannerSlider({ banners }: { banners: BannerData[] }) {
         )}
       </div>
       {n > 1 && (
-        <div className="absolute inset-x-0 bottom-4 flex items-center justify-center gap-2">
+        <div className={`flex items-center justify-center gap-2 ${b.imageDesktop ? "py-4" : "absolute inset-x-0 bottom-4"}`}>
           {banners.map((x, k) => (
             <button
               key={x.id}

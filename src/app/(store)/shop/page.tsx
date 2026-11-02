@@ -53,7 +53,7 @@ export default async function ShopPage({ searchParams }: { searchParams: SP }) {
           <p className="mt-2 text-muted">Try another word, or ask our doctor which medicine suits you.</p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <Link href="/shop" className="btn-outline">See all products</Link>
-            <Link href="/consult" className="btn-primary">Consult a doctor</Link>
+            <Link href="/consult" className="btn-primary">Consult an expert</Link>
           </div>
         </div>
       )}

@@ -64,7 +64,7 @@ export function Footer({ concerns, pages, settings, socials }: Props) {
         <div>
           <h2 className="mb-4 text-xl">Help</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
-            <li><Link href="/consult" className="hover:text-white">Consult a doctor</Link></li>
+            <li><Link href="/consult" className="hover:text-white">Consult an expert</Link></li>
             <li><Link href="/results" className="hover:text-white">Real results</Link></li>
             <li><Link href="/reviews" className="hover:text-white">Customer reviews</Link></li>
             <li><Link href="/stories" className="hover:text-white">Customer stories</Link></li>
