@@ -4,6 +4,7 @@ import { cardInclude, toCard } from "@/lib/catalog";
 import { BannerSlider } from "@/components/store/BannerSlider";
 import { ConcernShop } from "@/components/store/ConcernShop";
 import { iconPath } from "@/lib/icons";
+import { getSettings } from "@/lib/settings";
 import { DoctorPhoto } from "@/components/store/DoctorPhoto";
 import { VideoTestimonials } from "@/components/store/VideoTestimonials";
 import { HomeReviews } from "@/components/store/HomeReviews";
@@ -11,7 +12,7 @@ import { ResultsSection } from "@/components/store/ResultsSection";
 import { Reveal } from "@/components/store/Reveal";
 
 export default async function HomePage() {
-  const [banners, concerns, products, doctors, types, videos] = await Promise.all([
+  const [banners, concerns, products, doctors, types, videos, settings] = await Promise.all([
     db.banner.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
     db.concern.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
     db.product.findMany({
@@ -22,7 +23,11 @@ export default async function HomePage() {
     db.doctor.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
     db.consultationType.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
     db.testimonial.findMany({ where: { active: true }, include: { product: { select: { name: true, slug: true } } }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }),
+    getSettings(),
   ]);
+  const why = (Array.isArray(settings.whyPoints) ? (settings.whyPoints as { title?: string; text?: string }[]) : [])
+    .filter((w) => w?.title)
+    .map((w) => ({ title: String(w.title), text: String(w.text ?? "") }));
 
   return (
     <>
@@ -85,26 +90,23 @@ export default async function HomePage() {
 
       <HomeReviews />
 
-      <section className="border-b border-line" aria-label="Why NUPAL">
-        <div className="container-x grid gap-6 py-10 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ["Generations of practice", "Classical and proprietary Ayurvedic formulations"],
-            ["GMP · WHO-GMP · ISO 9001", "Certified manufacturing in Kochi"],
-            ["Doctor support", "Consult our physicians before you buy"],
-            ["Cash on delivery", "Pay when your order arrives"],
-          ].map(([t, s]) => (
-            <div key={t} className="flex items-start gap-3">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#567459" strokeWidth="1.4" aria-hidden="true" className="mt-0.5 shrink-0">
-                <path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l8-8" />
-              </svg>
-              <div>
-                <p className="font-display text-lg">{t}</p>
-                <p className="text-sm text-muted">{s}</p>
+      {why.length > 0 && (
+        <section className="border-b border-line" aria-label="Why NUPAL">
+          <div className={`container-x grid gap-6 py-10 sm:grid-cols-2 ${why.length >= 4 ? "lg:grid-cols-4" : why.length === 3 ? "lg:grid-cols-3" : ""}`}>
+            {why.map((w, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#567459" strokeWidth="1.4" aria-hidden="true" className="mt-0.5 shrink-0">
+                  <path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l8-8" />
+                </svg>
+                <div>
+                  <p className="font-display text-lg">{w.title}</p>
+                  {w.text && <p className="text-sm text-muted">{w.text}</p>}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }

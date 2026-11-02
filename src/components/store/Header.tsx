@@ -6,9 +6,8 @@ import { useCart } from "./CartProvider";
 import { Logo } from "./Logo";
 
 type Concern = { name: string; slug: string };
-type Menu = { id: string; name: string; items: { id: string; label: string; href: string }[] };
 
-export function Header({ concerns, types, menus }: { concerns: Concern[]; types: string[]; menus: Menu[] }) {
+export function Header({ concerns, types }: { concerns: Concern[]; types: string[] }) {
   const { count } = useCart();
   const [open, setOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -111,20 +110,9 @@ export function Header({ concerns, types, menus }: { concerns: Concern[]; types:
           <Link href="/shop?brand=MONOEXTRACTS" className="py-2 lg:py-3">
             Monoextracts
           </Link>
-          {menus.map((m) => (
-            <details key={m.id} className="group relative lg:py-3">
-              <summary className="flex cursor-pointer list-none items-center gap-1 py-2 lg:py-0">
-                {m.name} <span aria-hidden="true" className="text-xs">▾</span>
-              </summary>
-              <div className="grid gap-1 py-2 pl-3 lg:absolute lg:left-0 lg:top-full lg:z-50 lg:w-[280px] lg:rounded-xl lg:border lg:border-line lg:bg-white lg:p-3 lg:shadow-lg">
-                {m.items.map((it) => (
-                  <Link key={it.id} href={it.href} className="rounded-lg px-2 py-2 font-normal hover:bg-mist" onClick={pick}>
-                    {it.label}
-                  </Link>
-                ))}
-              </div>
-            </details>
-          ))}
+          <Link href="/about-us" className="py-2 lg:py-3" onClick={pick}>
+            About us
+          </Link>
           <Link href="/consult" className="py-2 text-sage lg:hidden">
             Consult a doctor
           </Link>

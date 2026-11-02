@@ -302,6 +302,7 @@ model Setting {
   youtubeUrl        String   @default("")
   resultsCount      Int      @default(10000) // number in the “Real results” counter
   resultsHook       String   @default("Click to see. Scroll to believe.")
+  whyPoints         Json     @default("[]") // “Why NUPAL” strip on the homepage: [{ title, text }]
   updatedAt         DateTime @updatedAt
 }
 

@@ -47,6 +47,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <F id="resultsCount" label="Number shown in the counter" inputMode="numeric" defaultValue={s.resultsCount} help="Shown as “10,000+ hair regrowth results”." />
             <F id="resultsHook" label="Headline" defaultValue={s.resultsHook} />
           </section>
+          <section className="a-card flex flex-col gap-3">
+            <h2 className="font-sans text-lg font-semibold">“Why NUPAL” points</h2>
+            <p className="text-sm text-[#56685d]">The short strip near the bottom of the homepage. Up to 4 points; leave all empty to hide it.</p>
+            {[0, 1, 2, 3].map((i) => {
+              const w = (Array.isArray(s.whyPoints) ? (s.whyPoints as { title?: string; text?: string }[]) : [])[i] ?? {};
+              return (
+                <div key={i} className="grid gap-2 rounded-xl border border-[#e8eeea] p-3 sm:grid-cols-[1fr_1.4fr]">
+                  <div><label htmlFor={`why_title_${i}`} className="a-label">Point {i + 1}</label><input id={`why_title_${i}`} name={`why_title_${i}`} defaultValue={w.title ?? ""} placeholder="e.g. Cash on delivery" className="a-input" /></div>
+                  <div><label htmlFor={`why_text_${i}`} className="a-label">Short line</label><input id={`why_text_${i}`} name={`why_text_${i}`} defaultValue={w.text ?? ""} placeholder="e.g. Pay when your order arrives" className="a-input" /></div>
+                </div>
+              );
+            })}
+          </section>
           <section className="a-card grid gap-4 sm:grid-cols-2">
             <h2 className="font-sans text-lg font-semibold sm:col-span-2">Delivery and cash on delivery</h2>
             <F id="shippingFee" label="Delivery charge (₹)" inputMode="numeric" defaultValue={s.shippingFee} />

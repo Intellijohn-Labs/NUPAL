@@ -151,7 +151,22 @@ async function main() {
     if (await db.page.findUnique({ where: { slug } })) continue;
     await db.page.create({ data: { slug, title, content: "", inFooter: false, blocks: { create: blocks.map((b, i) => ({ ...b, data: b.data as object, sortOrder: i + 1 })) } } });
   }
-  await db.page.updateMany({ where: { slug: { in: ["accreditations", "csr"] } }, data: { inAboutMenu: true } });
+  // Accreditations and CSR are linked from the footer.
+  await db.page.updateMany({ where: { slug: { in: ["accreditations", "csr"] } }, data: { inFooter: true } });
+  const site = await db.setting.findUnique({ where: { id: "site" } });
+  if (site && (!Array.isArray(site.whyPoints) || site.whyPoints.length === 0)) {
+    await db.setting.update({
+      where: { id: "site" },
+      data: {
+        whyPoints: [
+          { title: "Generations of practice", text: "Classical and proprietary Ayurvedic formulations" },
+          { title: "GMP · WHO-GMP · ISO 9001", text: "Certified manufacturing in Kochi" },
+          { title: "Doctor support", text: "Consult our physicians before you buy" },
+          { title: "Cash on delivery", text: "Pay when your order arrives" },
+        ],
+      },
+    });
+  }
 
   if ((await db.banner.count()) === 0) {
     await db.banner.createMany({

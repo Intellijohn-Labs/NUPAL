@@ -19,6 +19,7 @@ export async function saveSettings(f: FormData) {
     gstin: str(f, "gstin").toUpperCase(),
     resultsCount: Math.max(0, int(f, "resultsCount", 10000)),
     resultsHook: str(f, "resultsHook"),
+    whyPoints: [0, 1, 2, 3].map((i) => ({ title: str(f, `why_title_${i}`), text: str(f, `why_text_${i}`) })).filter((w) => w.title),
     shippingFee: int(f, "shippingFee"),
     freeShippingAbove: optInt(f, "freeShippingAbove"),
     codEnabled: bool(f, "codEnabled"),
