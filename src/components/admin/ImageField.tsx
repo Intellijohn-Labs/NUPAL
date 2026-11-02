@@ -14,6 +14,7 @@ export function ImageField({
   help,
   folder = "misc",
   maxSide = 1600,
+  square = false,
 }: {
   name?: string;
   existing?: string[];
@@ -21,6 +22,8 @@ export function ImageField({
   help?: string;
   folder?: string;
   maxSide?: number;
+  /** Trim white borders and centre on a square with padding (product photos). */
+  square?: boolean;
 }) {
   const [kept, setKept] = useState(existing);
   const [busy, setBusy] = useState(0);
@@ -47,7 +50,7 @@ export function ImageField({
     if (!files.length) return;
     setError("");
     setBusy((n) => n + files.length);
-    const res = await uploadFiles(multiple ? files : files.slice(0, 1), folder, undefined, maxSide);
+    const res = await uploadFiles(multiple ? files : files.slice(0, 1), folder, undefined, { maxSide, square });
     setBusy((n) => Math.max(0, n - files.length));
     const urls = res.filter((r) => r.url).map((r) => r.url!);
     const failed = res.filter((r) => r.status === "failed");

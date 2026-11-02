@@ -72,7 +72,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: SP 
                     <td className="a-td">
                       <Link href={`/admin/products/${p.id}`} className="flex items-center gap-3">
                         {p.images[0] ? (
-                          <img src={p.images[0]} alt="" className="h-12 w-12 rounded-lg object-cover" />
+                          <img src={p.images[0]} alt="" className="h-12 w-12 rounded-lg border border-[#e8eeea] bg-white object-contain p-0.5" />
                         ) : (
                           <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#e6efe9] text-xs text-[#56685d]">No photo</span>
                         )}

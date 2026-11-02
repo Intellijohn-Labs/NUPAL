@@ -31,7 +31,7 @@ export function CartView({ shippingFee, freeShippingAbove }: { shippingFee: numb
           {items.map((i) => (
             <li key={i.variantId} className="flex flex-wrap items-center gap-4 rounded-2xl border border-line p-4">
               <Link href={`/product/${i.slug}`} className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f4f1ea]">
-                {i.image ? <Image src={i.image} alt="" fill sizes="96px" className="object-cover" /> : <ProductArt name={i.name} type={i.type} size={56} />}
+                {i.image ? <Image src={i.image} alt="" fill sizes="96px" className="bg-white object-contain p-1.5" /> : <ProductArt name={i.name} type={i.type} size={56} />}
               </Link>
               <div className="min-w-[140px] flex-1">
                 <Link href={`/product/${i.slug}`} className="font-display text-lg hover:text-sage">{i.name}</Link>

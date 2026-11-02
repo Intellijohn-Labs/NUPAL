@@ -32,7 +32,7 @@ export function ProductCard({ p }: { p: CardProduct }) {
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-[0_20px_40px_-28px_rgba(35,64,46,.6)]">
-      <Link href={`/product/${p.slug}`} className="relative flex h-56 items-center justify-center overflow-hidden bg-[#f4f1ea]">
+      <Link href={`/product/${p.slug}`} className={`relative flex aspect-square items-center justify-center overflow-hidden ${p.image ? "bg-white" : "bg-[#f4f1ea]"}`}>
         {off > 0 && !out && (
           <span className="absolute left-3 top-3 z-10 rounded-md bg-pestle px-2 py-1 text-xs font-semibold text-white">{off}% off</span>
         )}
@@ -41,7 +41,7 @@ export function ProductCard({ p }: { p: CardProduct }) {
           <span className="absolute right-3 top-3 z-10 rounded-md bg-forest px-2 py-1 text-xs font-medium text-cream">Bestseller</span>
         )}
         {p.image ? (
-          <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+          <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-contain p-4 transition-transform duration-500 group-hover:scale-105" />
         ) : (
           <div className="transition-transform duration-500 group-hover:scale-105">
             <ProductArt name={p.name} type={p.type} size={92} />

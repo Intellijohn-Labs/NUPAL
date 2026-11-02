@@ -40,7 +40,7 @@ export function ProductGallery({ images, name, type, videoUrl }: { images: strin
               onClick={() => setI(k)}
               className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 ${k === i ? "border-sage" : "border-transparent"}`}
             >
-              <Image src={src} alt="" fill sizes="80px" className="object-cover" />
+              <Image src={src} alt="" fill sizes="80px" className="bg-white object-contain p-1" />
             </button>
           ))}
           {video && (
@@ -67,7 +67,7 @@ export function ProductGallery({ images, name, type, videoUrl }: { images: strin
             <span className="absolute bottom-4 left-4 rounded-full bg-white/95 px-3 py-1 text-sm font-medium text-forest">Watch video</span>
           </button>
         ) : images[i] ? (
-          <Image src={images[i]} alt={name} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+          <Image src={images[i]} alt={name} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="bg-white object-contain p-6" />
         ) : (
           <ProductArt name={name} type={type} size={200} />
         )}

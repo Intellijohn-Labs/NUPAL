@@ -129,7 +129,7 @@ export function ProductForm({ product, concerns, types }: { product?: Product; c
 
         <section className="a-card flex flex-col gap-3">
           <h2 className="font-sans text-lg font-semibold">Photos</h2>
-          <ImageField name="images" folder="products" existing={product?.images} help="Square photos look best (at least 1000 × 1000 px). First photo is the cover." />
+          <ImageField name="images" folder="products" square maxSide={1200} existing={product?.images} help="Any shape works — white borders are trimmed and the product is centred on a square automatically. First photo is the cover." />
           <div>
             <label htmlFor="videoUrl" className="a-label">Video link (optional)</label>
             <input id="videoUrl" name="videoUrl" type="url" defaultValue={product?.videoUrl} placeholder="https://www.youtube.com/watch?v=…" className="a-input" />
