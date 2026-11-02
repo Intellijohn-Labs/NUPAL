@@ -254,6 +254,7 @@ model Page {
   title     String
   content   String   @default("") // markdown
   inFooter  Boolean  @default(true)
+  inAboutMenu Boolean @default(false) // listed in the header’s “About us ▾” menu
   published Boolean  @default(true)
   seoDesc   String?
   blocks    PageBlock[]
@@ -277,23 +278,6 @@ model PageBlock {
   sortOrder Int    @default(0)
 }
 
-// Dropdown menus in the header, e.g. “About us ▾”.
-model MenuGroup {
-  id        String     @id @default(cuid())
-  name      String
-  sortOrder Int        @default(0)
-  active    Boolean    @default(true)
-  items     MenuItem[]
-}
-
-model MenuItem {
-  id        String    @id @default(cuid())
-  groupId   String
-  group     MenuGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  label     String
-  href      String
-  sortOrder Int       @default(0)
-}
 
 // Single row (id = "site") holding editable site-wide settings.
 model Setting {

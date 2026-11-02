@@ -12,7 +12,7 @@ export function Sidebar({ items, userName, roleLabel, logout }: { items: Item[];
   const isActive = (href: string) => (href === "/admin" ? path === "/admin" : path.startsWith(href));
 
   return (
-    <aside className="bg-[#0e2017] text-[#eaf2ec] lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0">
+    <aside className="bg-[#0e2017] text-[#eaf2ec] lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:overflow-y-auto [scrollbar-color:#2e4a3a_transparent] [scrollbar-width:thin]">
       <div className="flex items-center justify-between px-5 py-4 lg:py-6">
         <Link href="/admin" className="flex items-center gap-2">
           <img src="/brand/nupal-logo-light.svg" alt="NUPAL" className="h-9 w-auto" />

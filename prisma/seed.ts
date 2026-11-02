@@ -151,26 +151,7 @@ async function main() {
     if (await db.page.findUnique({ where: { slug } })) continue;
     await db.page.create({ data: { slug, title, content: "", inFooter: false, blocks: { create: blocks.map((b, i) => ({ ...b, data: b.data as object, sortOrder: i + 1 })) } } });
   }
-  if ((await db.menuGroup.count()) === 0) {
-    await db.menuGroup.create({
-      data: {
-        name: "About us",
-        sortOrder: 1,
-        items: {
-          create: [
-            ["About NUPAL", "/about-us#about-nupal"],
-            ["Vision & Mission", "/about-us#vision-mission"],
-            ["Chairman’s Message", "/about-us#chairmans-message"],
-            ["Management", "/about-us#management"],
-            ["Our Associates", "/about-us#our-associates"],
-            ["Accreditations & Approvals", "/accreditations"],
-            ["CSR", "/csr"],
-            ["Testimonials", "/stories"],
-          ].map(([label, href], i) => ({ label, href, sortOrder: i + 1 })),
-        },
-      },
-    });
-  }
+  await db.page.updateMany({ where: { slug: { in: ["accreditations", "csr"] } }, data: { inAboutMenu: true } });
 
   if ((await db.banner.count()) === 0) {
     await db.banner.createMany({

@@ -19,7 +19,6 @@ const NAV = [
   { href: "/admin/testimonials", label: "Video testimonials", area: "testimonials" },
   { href: "/admin/banners", label: "Homepage banners", area: "banners" },
   { href: "/admin/pages", label: "Pages & policies", area: "pages" },
-  { href: "/admin/menus", label: "Menus", area: "pages" },
   { href: "/admin/settings", label: "Store settings", area: "settings" },
   { href: "/admin/staff", label: "Staff & access", area: "staff" },
 ] as const;

@@ -22,6 +22,12 @@ export function PageForm({ page }: { page: Page | null }) {
         <div><label htmlFor="seoDesc" className="a-label">Search description</label><textarea id="seoDesc" name="seoDesc" rows={3} defaultValue={page?.seoDesc ?? ""} className="a-textarea" /></div>
         <label className="flex items-center gap-3 text-[15px]"><input type="checkbox" name="published" defaultChecked={page?.published ?? true} className="h-5 w-5 accent-[#2e6b47]" />Published</label>
         <label className="flex items-center gap-3 text-[15px]"><input type="checkbox" name="inFooter" defaultChecked={page?.inFooter ?? true} className="h-5 w-5 accent-[#2e6b47]" />Link in footer</label>
+        {page?.slug !== "about-us" && (
+          <label className="flex items-start gap-3 text-[15px]">
+            <input type="checkbox" name="inAboutMenu" defaultChecked={page?.inAboutMenu ?? false} className="mt-0.5 h-5 w-5 accent-[#2e6b47]" />
+            <span>Show in the “About us” menu<span className="block text-xs text-[#56685d]">The About page’s own sections are added to that menu automatically.</span></span>
+          </label>
+        )}
         {error && <p role="alert" className="rounded-lg bg-[#fbe6e0] px-3 py-2 text-sm text-[#a3361f]">{error}</p>}
         <SubmitButton className="a-btn h-11">Save page</SubmitButton>
       </section>
