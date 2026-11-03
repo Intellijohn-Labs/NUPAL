@@ -61,7 +61,7 @@ function Product({ p, className, size }: { p: HeroProduct | undefined; className
     <div className={className}>
       {p.image ? (
         <div className="relative aspect-[3/4] w-full">
-          <Image src={p.image} alt="" fill sizes="240px" className="object-contain drop-shadow-[0_18px_22px_rgba(0,0,0,.25)]" />
+          <Image src={p.image} alt="" fill sizes="240px" className="object-contain" style={{ filter:"drop-shadow(0 18px 22px rgba(0,0,0,.3))" }} />
         </div>
       ) : (
         <ProductArt name={p.name} type={p.type} size={size} />
@@ -77,14 +77,17 @@ function Stage({ products, theme }: { products: HeroProduct[]; theme: (typeof TH
     <div aria-hidden="true" className="hero-in relative mx-auto hidden aspect-square w-full max-w-[480px] md:block" style={{ animationDelay: ".15s" }}>
       <div className="absolute inset-0 rounded-full border border-dashed border-gold/40" />
       <div className="absolute inset-[6%] rounded-full" style={{ background: theme.disc }} />
+      <div className="absolute inset-[8%] rounded-full bg-[#2a5a3d] opacity-40" />
       <svg viewBox="0 0 400 400" className="hero-sway absolute inset-0">
         <path d="M40 330c20-90 100-140 190-120-35 80-110 125-190 120z" fill={theme.leaf[0]} />
         <path d="M370 320c-30-80-100-120-180-100 40 70 110 110 180 100z" fill={theme.leaf[1]} />
         <path d="M60 120c40-60 120-70 170-30-40 45-120 60-170 30z" fill={theme.leaf[2]} opacity=".8" />
       </svg>
-      <Product p={left} size={92} className="absolute bottom-[16%] left-[10%] w-[26%]" />
-      <Product p={right} size={92} className="absolute bottom-[16%] right-[8%] w-[26%]" />
-      <Product p={main} size={150} className="hero-float absolute left-1/2 top-1/2 w-[40%] -translate-x-1/2 -translate-y-[52%]" />
+      {left?.image && <Product p={left} size={92} className="absolute bottom-[14%] left-[8%] w-[25%]" />}
+      {right?.image && <Product p={right} size={92} className="absolute bottom-[14%] right-[6%] w-[25%]" />}
+      <Product p={main} size={160}
+        className={`hero-float absolute left-1/2 -translate-x-1/2 ${left?.image || right?.image ? "top-[12%] w-[42%]" : "top-1/2 w-[55%] -translate-y-1/2"}`}
+      />
       <span className="hero-float absolute left-[2%] top-[14%] rounded-2xl border border-white/30 bg-white/15 px-3.5 py-2 text-[13px] backdrop-blur" style={{ animationDuration: "7s" }}>
         100% Ayurvedic
       </span>

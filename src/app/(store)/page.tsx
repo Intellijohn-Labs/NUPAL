@@ -30,10 +30,8 @@ export default async function HomePage() {
     .filter((w) => w?.title)
     .map((w) => ({ title: String(w.title), text: String(w.text ?? "") }));
   // Products shown in the hero composition: bestsellers first, those with photos preferred.
-  const heroProducts = [...products]
-    .sort((a, b) => Number(!!b.images[0]) - Number(!!a.images[0]))
-    .slice(0, 3)
-    .map((p) => ({ name: p.name, type: p.type, image: p.images[0] ?? null }));
+  // Hero composition always uses the drawn product art (not uploaded photos), so it stays consistent.
+  const heroProducts = products.slice(0, 3).map((p) => ({ name: p.name, type: p.type, image: null }));
 
   return (
     <>

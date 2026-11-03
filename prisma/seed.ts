@@ -138,6 +138,18 @@ async function main() {
       ],
     });
   }
+  // New About sections: story opening and numbers at the top, milestones and values at the end (added once).
+  const aboutNow = await db.page.findUnique({ where: { slug: "about-us" }, include: { blocks: true } });
+  if (aboutNow && !aboutNow.blocks.some((b) => b.type === "intro")) {
+    await db.pageBlock.createMany({
+      data: [
+        { pageId: aboutNow.id, type: "intro", title: "Since [year]", anchor: "our-story", sortOrder: -2, data: { eyebrow: "Our story", body: "New Udaya Pharmacy & Ayurvedic Laboratories (NUPAL) was shaped through many generations that have strived for excellence in unique, life-saving Ayurvedic medicines.\n\n[Add a few lines about how NUPAL began.]", name: "[Founder’s name]", role: "Founder" } },
+        { pageId: aboutNow.id, type: "stats", title: "", anchor: "", sortOrder: -1, data: { stats: [{ value: 100, suffix: "+", label: "Ayurvedic formulations" }, { value: 10000, suffix: "+", label: "Hair regrowth results" }, { value: 3, suffix: "", label: "Quality certifications" }, { value: 2, suffix: "", label: "Ayurvedic experts" }] } },
+        { pageId: aboutNow.id, type: "timeline", title: "Our journey", anchor: "our-journey", sortOrder: 50, data: { items: [{ year: "[Year]", title: "NUPAL founded in Kochi", text: "[Add details]" }, { year: "[Year]", title: "[Milestone]", text: "" }, { year: "[Year]", title: "GMP and ISO 9001 certification", text: "" }, { year: "Today", title: "Medicines and expert care online", text: "" }] } },
+        { pageId: aboutNow.id, type: "cards", title: "What we stand for", anchor: "what-we-stand-for", sortOrder: 51, data: { intro: "", cards: [{ title: "Authentic formulations", text: "Classical and proprietary medicines made the traditional way." }, { title: "Certified manufacturing", text: "Made in Kochi under GMP, WHO-GMP and ISO 9001 standards." }, { title: "Expert guidance", text: "Ayurvedic experts to help you choose the right care." }, { title: "Care that lasts", text: "Generations of trust from families across Kerala." }] } },
+      ],
+    });
+  }
   for (const [slug, title, blocks] of [
     ["accreditations", "Accreditations & Approvals", [
       { type: "text", title: "", anchor: "", data: { body: "NUPAL’s manufacturing is certified to GMP, WHO-GMP and ISO 9001:2015 standards. [Confirm and add licence details.]" } },

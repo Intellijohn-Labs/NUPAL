@@ -7,7 +7,7 @@ import { slugify } from "@/lib/format";
 import { str } from "@/lib/form";
 import { BLOCK_TYPES } from "@/lib/blocks";
 
-const DEFAULT_TITLE: Record<string, string> = { text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
+const DEFAULT_TITLE: Record<string, string> = { intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
 
 async function refresh(pageId: string) {
   const page = await db.page.findUnique({ where: { id: pageId }, select: { slug: true } });
@@ -42,7 +42,23 @@ export async function saveBlock(id: string, f: FormData) {
   const title = str(f, "title");
   let data: Record<string, unknown> = {};
 
-  if (b.type === "text") {
+  const rows = (...names: string[]) => {
+    const cols = names.map((n) => f.getAll(`row_${n}`).map(String));
+    return cols[0].map((_, i) => Object.fromEntries(names.map((n, k) => [n, (cols[k][i] ?? "").trim()])));
+  };
+  if (b.type === "intro") {
+    data = { eyebrow: str(f, "eyebrow"), image: keep(f, "image")[0] ?? null, body: str(f, "body"), name: str(f, "name"), role: str(f, "role") };
+  } else if (b.type === "stats") {
+    data = {
+      stats: rows("value", "suffix", "label")
+        .map((r) => ({ value: Math.max(0, parseInt(r.value.replace(/[^\d]/g, ""), 10) || 0), suffix: r.suffix.slice(0, 4), label: r.label }))
+        .filter((r) => r.label),
+    };
+  } else if (b.type === "timeline") {
+    data = { items: rows("year", "title", "text").filter((r) => r.year || r.title) };
+  } else if (b.type === "cards") {
+    data = { intro: str(f, "intro"), cards: rows("title", "text").filter((r) => r.title) };
+  } else if (b.type === "text") {
     data = { body: str(f, "body"), image: keep(f, "image")[0] ?? null, imageSide: str(f, "imageSide") === "left" ? "left" : "right" };
   } else if (b.type === "message") {
     data = { photo: keep(f, "photo")[0] ?? null, name: str(f, "name"), role: str(f, "role"), body: str(f, "body") };

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { db } from "@/lib/db";
@@ -27,7 +28,7 @@ export default async function CmsPage({ params }: { params: P }) {
         </div>
       )}
       {page.blocks.map((b) => (
-        <section key={b.id} id={b.anchor || undefined} className="scroll-mt-32 lg:scroll-mt-28" aria-label={b.title || undefined}>
+        <section key={b.id} id={b.anchor || undefined} className="scroll-mt-48" aria-label={b.title || undefined}>
           <PageBlock b={{ id: b.id, type: b.type, title: b.title, anchor: b.anchor, data: b.data }} />
         </section>
       ))}
@@ -55,24 +56,27 @@ export default async function CmsPage({ params }: { params: P }) {
   );
 
   return (
-    <article className={`container-x py-12 sm:py-16 ${withNav || page.blocks.length ? "" : "max-w-[760px]"}`}>
-      <h1 className="mb-8 text-[clamp(32px,4vw,48px)]">{page.title}</h1>
-      {withNav ? (
-        <div className="grid items-start gap-10 lg:grid-cols-[220px_1fr]">
-          <nav aria-label="On this page" className="sticky top-[129px] z-20 -mx-4 border-b border-line bg-white/95 px-4 backdrop-blur lg:top-28 lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0">
-            <ul className="no-scrollbar flex gap-1 overflow-x-auto py-2 lg:flex-col lg:gap-0.5 lg:py-0">
-              {sections.map((s) => (
-                <li key={s.id} className="shrink-0">
-                  <a href={`#${s.anchor}`} className="block rounded-lg px-3 py-2 text-[15px] text-muted hover:bg-cream hover:text-ink">{s.title}</a>
-                </li>
-              ))}
-            </ul>
+    <article>
+      <header className="bg-cream">
+        <div className="container-x py-12 sm:py-16">
+          <nav aria-label="Breadcrumb" className="hero-in mb-3 text-sm text-muted">
+            <Link href="/" className="hover:text-ink">Home</Link> / <span className="text-ink">{page.title}</span>
           </nav>
-          <div className="flex min-w-0 flex-col gap-16">{content}</div>
+          <h1 className="hero-in text-[clamp(36px,4.8vw,62px)] leading-[1.05]" style={{ animationDelay: ".08s" }}>{page.title}</h1>
         </div>
-      ) : (
-        <div className="flex flex-col gap-14">{content}</div>
+      </header>
+      {withNav && (
+        <nav aria-label="On this page" className="sticky top-[129px] z-30 border-b border-line bg-white/95 backdrop-blur lg:top-[121px]">
+          <ul className="container-x no-scrollbar flex gap-1 overflow-x-auto py-2">
+            {sections.map((s) => (
+              <li key={s.id} className="shrink-0">
+                <a href={`#${s.anchor}`} className="block rounded-full px-4 py-2 text-[15px] text-muted transition-colors hover:bg-cream hover:text-ink">{s.title}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       )}
+      <div className={`container-x flex flex-col gap-20 py-14 sm:gap-24 sm:py-20 ${page.blocks.length ? "" : "max-w-[760px]"}`}>{content}</div>
     </article>
   );
 }

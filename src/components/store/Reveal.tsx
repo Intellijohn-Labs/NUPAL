@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
  * Fades and slides its content in when it scrolls into view. `index` staggers items in a row.
  * Content is visible by default (no JavaScript, reduced motion, or already on screen).
  */
-export function Reveal({ children, index = 0, className = "", from = "up" }: { children: React.ReactNode; index?: number; className?: string; from?: "up" | "left" | "zoom" }) {
+export function Reveal({ children, index = 0, className = "", from = "up" }: { children: React.ReactNode; index?: number; className?: string; from?: "up" | "left" | "right" | "zoom" }) {
   const ref = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"static" | "hidden" | "shown">("static");
 
@@ -28,7 +28,7 @@ export function Reveal({ children, index = 0, className = "", from = "up" }: { c
     return () => io.disconnect();
   }, []);
 
-  const hidden = from === "left" ? "opacity-0 -translate-x-8" : from === "zoom" ? "opacity-0 scale-95" : "opacity-0 translate-y-10";
+  const hidden = from === "left" ? "opacity-0 -translate-x-8" : from === "right" ? "opacity-0 translate-x-8" : from === "zoom" ? "opacity-0 scale-95" : "opacity-0 translate-y-10";
   return (
     <div
       ref={ref}
