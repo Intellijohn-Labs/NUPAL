@@ -29,10 +29,15 @@ export default async function HomePage() {
   const why = (Array.isArray(settings.whyPoints) ? (settings.whyPoints as { title?: string; text?: string }[]) : [])
     .filter((w) => w?.title)
     .map((w) => ({ title: String(w.title), text: String(w.text ?? "") }));
+  // Products shown in the hero composition: bestsellers first, those with photos preferred.
+  const heroProducts = [...products]
+    .sort((a, b) => Number(!!b.images[0]) - Number(!!a.images[0]))
+    .slice(0, 3)
+    .map((p) => ({ name: p.name, type: p.type, image: p.images[0] ?? null }));
 
   return (
     <>
-      <BannerSlider banners={banners} />
+      <BannerSlider banners={banners} products={heroProducts} trust={why.length >= 4 ? [why[1].title, why[3].title] : why.slice(0, 2).map((w) => w.title)} />
       <ConcernShop
         products={products.map(toCard)}
         concerns={concerns.map((c) => ({ id: c.id, name: c.name, slug: c.slug, iconPath: iconPath(c.icon) }))}

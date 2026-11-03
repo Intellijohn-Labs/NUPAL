@@ -22,6 +22,7 @@ export async function saveTestimonial(id: string | null, _prev: string | null, f
     thumbnail: images[0] ?? null,
     vertical: false, // all videos are shown wide (16:9)
     productId: optStr(f, "productId"),
+    concernIds: f.getAll("concerns").map(String),
     active: bool(f, "active"),
     sortOrder: int(f, "sortOrder"),
   };

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { ProductCard, type CardProduct } from "./ProductCard";
+import { Reveal } from "./Reveal";
 
 type P = CardProduct & { concernIds: string[] };
 type Concern = { id: string; name: string; slug: string; iconPath: string };
@@ -33,8 +34,12 @@ export function ConcernShop({ products, concerns }: { products: P[]; concerns: C
 
   return (
     <>
-      <nav aria-label="Shop by health concern" className="border-b border-line bg-white">
-        <div role="group" className="container-x no-scrollbar flex gap-1 overflow-x-auto py-4">
+      <nav aria-labelledby="find-care" className="bg-white pt-10 sm:pt-12">
+        <Reveal className="container-x">
+          <p className="text-xs font-medium uppercase tracking-[.18em] text-sage">Shop by health concern</p>
+          <h2 id="find-care" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight">Find care for…</h2>
+        </Reveal>
+        <div role="group" className="container-x no-scrollbar flex gap-1 overflow-x-auto py-5">
           {items.map((c) => {
             const on = active === c.id;
             return (
@@ -43,9 +48,9 @@ export function ConcernShop({ products, concerns }: { products: P[]; concerns: C
                 type="button"
                 aria-pressed={on}
                 onClick={() => pick(c.id)}
-                className="group flex min-w-[96px] flex-1 flex-col items-center gap-2 rounded-xl px-2 py-1 text-center text-sm"
+                className="group flex min-w-[104px] flex-1 flex-col items-center gap-2.5 rounded-xl px-2 py-1 text-center text-sm"
               >
-                <span className={`flex h-14 w-14 items-center justify-center rounded-full transition-colors ${on ? "bg-sage" : "bg-[#f1eee7] group-hover:bg-mist"}`}>
+                <span className={`flex h-[72px] w-[72px] items-center justify-center rounded-full transition-[background-color,transform] duration-300 group-hover:-translate-y-1 ${on ? "bg-forest" : "bg-[#f1eee7] group-hover:bg-mist"}`}>
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={on ? "#fff" : "#3E5A42"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d={c.iconPath} />
                   </svg>
@@ -72,7 +77,7 @@ export function ConcernShop({ products, concerns }: { products: P[]; concerns: C
           </div>
           {concern && matching.length > 0 && (
             <Link href={`/concern/${concern.slug}`} className="font-medium text-sage underline-offset-4 hover:underline">
-              View all {concern.name} products
+              See everything for {concern.name} →
             </Link>
           )}
         </div>

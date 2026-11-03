@@ -43,7 +43,7 @@ export function Header({ concerns, types }: { concerns: Concern[]; types: string
         </button>
         <Logo className="h-10 w-auto sm:h-12" />
 
-        <form action="/shop" role="search" className="order-last flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-cream px-4 lg:order-none lg:w-auto lg:flex-1">
+        <form action="/shop" role="search" className="order-last flex h-12 w-full items-center gap-2 rounded-full border border-line bg-white px-5 transition-colors focus-within:border-sage lg:order-none lg:w-auto lg:flex-1">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5E6862" strokeWidth="2" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <path d="M20 20l-3.5-3.5" />
@@ -61,7 +61,7 @@ export function Header({ concerns, types }: { concerns: Concern[]; types: string
         </form>
 
         <div className="ml-auto flex items-center gap-1 lg:ml-0">
-          <Link href="/consult" className="btn-primary hidden h-10 px-4 text-sm sm:inline-flex">
+          <Link href="/consult" className="btn hidden h-11 bg-forest px-5 text-sm text-cream hover:bg-[#2E5A3F] sm:inline-flex">
             Consult an expert
           </Link>
           <Link href="/cart" aria-label={`Cart, ${count} items`} className="relative flex h-11 w-11 items-center justify-center">
@@ -109,6 +109,9 @@ export function Header({ concerns, types }: { concerns: Concern[]; types: string
           </Link>
           <Link href="/shop?brand=MONOEXTRACTS" className="py-2 lg:py-3">
             Monoextracts
+          </Link>
+          <Link href="/results" className="py-2 lg:py-3" onClick={pick}>
+            Real results
           </Link>
           <Link href="/about-us" className="py-2 lg:py-3" onClick={pick}>
             About us

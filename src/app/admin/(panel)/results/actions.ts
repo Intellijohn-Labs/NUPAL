@@ -133,6 +133,7 @@ export async function updateResult(id: string, f: FormData) {
     data: {
       patientId: newId,
       sortOrder: parseInt(String(f.get("sortOrder") ?? "0"), 10) || 0,
+      concernIds: f.getAll("concerns").map(String),
       consent,
       ...(!consent ? { status: r.status === "PUBLISHED" ? "HIDDEN" : r.status, featured: false } : {}),
     },

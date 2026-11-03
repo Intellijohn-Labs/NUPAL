@@ -59,7 +59,7 @@ export default async function CmsPage({ params }: { params: P }) {
       <h1 className="mb-8 text-[clamp(32px,4vw,48px)]">{page.title}</h1>
       {withNav ? (
         <div className="grid items-start gap-10 lg:grid-cols-[220px_1fr]">
-          <nav aria-label="On this page" className="sticky top-[108px] z-20 -mx-4 border-b border-line bg-white/95 px-4 backdrop-blur lg:top-28 lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0">
+          <nav aria-label="On this page" className="sticky top-[129px] z-20 -mx-4 border-b border-line bg-white/95 px-4 backdrop-blur lg:top-28 lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0">
             <ul className="no-scrollbar flex gap-1 overflow-x-auto py-2 lg:flex-col lg:gap-0.5 lg:py-0">
               {sections.map((s) => (
                 <li key={s.id} className="shrink-0">

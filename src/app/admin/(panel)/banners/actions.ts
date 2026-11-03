@@ -14,6 +14,7 @@ export async function saveBanner(id: string | null, f: FormData) {
   const [mobile] = isText ? [] : await collectImages(f, "mobile", "banners");
   const data = {
     title,
+    eyebrow: str(f, "eyebrow"),
     subtitle: str(f, "subtitle"),
     ctaLabel: str(f, "ctaLabel") || "Shop now",
     ctaHref: str(f, "ctaHref") || "/shop",

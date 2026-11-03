@@ -168,11 +168,16 @@ async function main() {
     });
   }
 
+  // Update the first starter banner to the new hero wording (only if it still has the original text).
+  await db.banner.updateMany({
+    where: { title: "Generations of Ayurvedic care, from Kochi" },
+    data: { eyebrow: "Generations of Ayurvedic care · Kochi", title: "Kerala Ayurveda,\nprescribed with care.", subtitle: "Classical and proprietary medicines for liver, hair, heart and everyday health — with Ayurvedic experts to guide you.", ctaLabel: "Shop bestsellers", ctaHref: "/#bestsellers", theme: "green" },
+  });
   if ((await db.banner.count()) === 0) {
     await db.banner.createMany({
       data: [
-        { title: "Generations of Ayurvedic care, from Kochi", subtitle: "Medicines for liver care, digestion, heart health, immunity, hair and women’s health.", ctaLabel: "Shop bestsellers", ctaHref: "/#bestsellers", theme: "cream", sortOrder: 1 },
-        { title: "Not sure what’s right for you?", subtitle: "Talk to our Ayurvedic doctors by video, phone or at the clinic. Book in under a minute.", ctaLabel: "Book a consultation", ctaHref: "/consult", theme: "green", sortOrder: 2 },
+        { eyebrow: "Generations of Ayurvedic care · Kochi", title: "Kerala Ayurveda,\nprescribed with care.", subtitle: "Classical and proprietary medicines for liver, hair, heart and everyday health — with Ayurvedic experts to guide you.", ctaLabel: "Shop bestsellers", ctaHref: "/#bestsellers", theme: "green", sortOrder: 1 },
+        { eyebrow: "Personal guidance", title: "Not sure what’s right?\nAsk our experts.", subtitle: "Consult our Ayurvedic experts by video, phone or at the clinic. Book in under a minute.", ctaLabel: "Book a consultation", ctaHref: "/consult", theme: "cream", sortOrder: 2 },
       ],
     });
   }

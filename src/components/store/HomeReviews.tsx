@@ -12,13 +12,13 @@ export async function HomeReviews() {
   const all = await db.review.aggregate({ where: { status: "APPROVED" }, _avg: { rating: true }, _count: true });
 
   return (
-    <section className="container-x py-16 sm:py-20" aria-labelledby="home-reviews">
+    <section className="container-x py-20 sm:py-24" aria-labelledby="home-reviews">
       <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 id="home-reviews" className="text-[clamp(28px,3.4vw,42px)]">What our customers say</h2>
-          <p className="mt-2 flex items-center gap-2 text-muted">
-            <Stars value={all._avg.rating ?? 0} /> {(all._avg.rating ?? 0).toFixed(1)} average from {all._count} {all._count === 1 ? "review" : "reviews"}
+          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[.18em] text-sage">
+            <Stars value={all._avg.rating ?? 0} size={14} /> {(all._avg.rating ?? 0).toFixed(1)} average · {all._count} {all._count === 1 ? "review" : "reviews"}
           </p>
+          <h2 id="home-reviews" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight">What our customers say</h2>
         </div>
       </Reveal>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

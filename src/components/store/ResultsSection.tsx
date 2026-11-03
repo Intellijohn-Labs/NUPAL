@@ -15,9 +15,9 @@ export async function ResultsSection() {
 
   return (
     <section aria-labelledby="results-h" className="bg-cream">
-      <div className="container-x grid items-center gap-x-12 gap-y-6 py-16 sm:py-20 lg:grid-cols-[.85fr_1.6fr]">
+      <div className="container-x grid items-center gap-x-12 gap-y-6 py-20 sm:py-24 lg:grid-cols-[.85fr_1.6fr]">
         <Reveal from="left" className="flex flex-col items-start">
-          <p className="text-[13px] font-medium uppercase tracking-[.08em] text-sage">Real results</p>
+          <p className="text-xs font-medium uppercase tracking-[.18em] text-sage">Real results</p>
           <p className="mt-2 font-display text-[clamp(44px,5vw,60px)] leading-none">
             <CountUp to={s.resultsCount} />+
           </p>

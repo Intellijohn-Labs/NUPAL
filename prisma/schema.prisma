@@ -37,6 +37,8 @@ model Concern {
   name      String
   slug      String              @unique
   icon      String              @default("leaf") // key of a built-in icon
+  intro     String              @default("") // short text at the top of the concern page (markdown)
+  faqs      Json                @default("[]") // [{ q, a }] shown on the concern page
   sortOrder Int                 @default(0)
   active    Boolean             @default(true)
   products  ProductOnConcern[]
@@ -237,6 +239,7 @@ model Booking {
 
 model Banner {
   id           String  @id @default(cuid())
+  eyebrow      String  @default("") // small line above the headline (text banners)
   title        String
   subtitle     String  @default("")
   ctaLabel     String  @default("Shop now")
@@ -343,6 +346,7 @@ model Testimonial {
   vertical  Boolean  @default(true) // phone-style 9:16 video
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  concernIds String[] @default([]) // health concerns this video belongs to
   active    Boolean  @default(true)
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
@@ -383,6 +387,7 @@ model Result {
   afterUrl  String?
   imageUrl  String? // single image, e.g. a ready-made collage
   consent   Boolean      @default(false) // customer agreed to their photos being shown
+  concernIds String[]    @default([]) // health concerns, e.g. Hair Care
   status    ResultStatus @default(DRAFT)
   featured  Boolean      @default(false) // one of the 4 on the homepage
   sortOrder Int          @default(0)

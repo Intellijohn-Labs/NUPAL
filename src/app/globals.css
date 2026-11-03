@@ -93,6 +93,12 @@
 @keyframes marquee { to { transform: translateX(-50%); } }
 .marquee { animation: marquee 40s linear infinite; }
 .marquee:hover { animation-play-state: paused; }
+@keyframes heroin { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.hero-in { animation: heroin .9s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes herofloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+.hero-float { animation: herofloat 6s ease-in-out infinite; }
+@keyframes herosway { 0%, 100% { rotate: 0deg; } 50% { rotate: 3deg; } }
+.hero-sway { transform-origin: 50% 100%; animation: herosway 8s ease-in-out infinite; }
 @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .fade-in { animation: fadein .5s ease both; }
 .no-scrollbar { scrollbar-width: none; }

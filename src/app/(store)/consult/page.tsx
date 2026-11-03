@@ -15,7 +15,8 @@ const FAQ = [
   ["Is my health information private?", "Yes. Your details are visible only to our doctors and authorised NUPAL staff."],
 ];
 
-export default async function ConsultPage() {
+export default async function ConsultPage({ searchParams }: { searchParams: Promise<{ concern?: string }> }) {
+  const concern = ((await searchParams).concern ?? "").slice(0, 60);
   const [doctors, types] = await Promise.all([
     db.doctor.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
     db.consultationType.findMany({ where: { active: true }, orderBy: { sortOrder: "asc" } }),
@@ -54,6 +55,7 @@ export default async function ConsultPage() {
         <BookingWidget
           doctors={doctors.map((d) => ({ id: d.id, name: d.name }))}
           types={types.map((t) => ({ id: t.id, key: t.key, name: t.name, description: t.description, durationMin: t.durationMin, fee: t.fee }))}
+          initialConcern={concern}
         />
       </div>
       <section className="container-x max-w-[820px] pb-16">

@@ -8,9 +8,10 @@ import { deleteTestimonial } from "./actions";
 
 export default async function TestimonialsPage() {
   await requireArea("testimonials");
-  const [items, products] = await Promise.all([
+  const [items, products, concerns] = await Promise.all([
     db.testimonial.findMany({ include: { product: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] }),
     db.product.findMany({ where: { isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    db.concern.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, name: true } }),
   ]);
 
   return (
@@ -32,7 +33,7 @@ export default async function TestimonialsPage() {
                   <span className="text-sm text-[#56685d]">{t.active ? "Showing" : "Hidden"} · {t.sortOrder}</span>
                 </summary>
                 <div className="mt-4 border-t border-[#e8eeea] pt-4">
-                  <TestimonialForm t={t} products={products} />
+                  <TestimonialForm t={t} products={products} concerns={concerns} />
                   <form action={deleteTestimonial.bind(null, t.id)} className="mt-3"><ConfirmButton message="Delete this video testimonial?">Delete</ConfirmButton></form>
                 </div>
               </details>
@@ -42,7 +43,7 @@ export default async function TestimonialsPage() {
         </div>
         <section className="a-card">
           <h2 className="mb-4 font-sans text-lg font-semibold">Add a video</h2>
-          <TestimonialForm products={products} next={items.length + 1} />
+          <TestimonialForm products={products} concerns={concerns} next={items.length + 1} />
         </section>
       </div>
     </>

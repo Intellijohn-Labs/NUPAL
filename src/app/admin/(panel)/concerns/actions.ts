@@ -28,3 +28,14 @@ export async function deleteConcern(id: string) {
   await db.concern.delete({ where: { id } });
   revalidatePath("/", "layout");
 }
+
+/** Intro text and FAQs shown on the concern’s own page. */
+export async function saveConcernContent(id: string, f: FormData) {
+  await requireArea("concerns");
+  const q = f.getAll("faq_q").map(String);
+  const a = f.getAll("faq_a").map(String);
+  const faqs = q.map((x, i) => ({ q: x.trim(), a: (a[i] ?? "").trim() })).filter((x) => x.q && x.a);
+  const c = await db.concern.update({ where: { id }, data: { intro: str(f, "intro"), faqs } });
+  revalidatePath(`/concern/${c.slug}`);
+  revalidatePath("/admin/concerns");
+}

@@ -16,7 +16,8 @@ const ICONS: Record<string, string> = {
 };
 const CONCERNS = ["Liver health", "Digestion & acidity", "Heart health", "Diabetes care", "Women’s health", "Hair", "Skin", "Cough & breathing", "Piles", "Joint pain", "Weight", "Other"];
 
-export function BookingWidget({ doctors, types }: { doctors: Doctor[]; types: CType[] }) {
+export function BookingWidget({ doctors, types, initialConcern = "" }: { doctors: Doctor[]; types: CType[]; initialConcern?: string }) {
+  const concernOptions = initialConcern && !CONCERNS.includes(initialConcern) ? [initialConcern, ...CONCERNS] : CONCERNS;
   const [step, setStep] = useState(1);
   const [doctorId, setDoctorId] = useState<string>("any");
   const [typeId, setTypeId] = useState<string>("");
@@ -221,9 +222,9 @@ export function BookingWidget({ doctors, types }: { doctors: Doctor[]; types: CT
             </div>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="b-concern" className="label">Main concern</label>
-              <select id="b-concern" name="concern" required defaultValue="" className="field">
+              <select id="b-concern" name="concern" required defaultValue={initialConcern} className="field">
                 <option value="" disabled>Choose one</option>
-                {CONCERNS.map((c) => <option key={c}>{c}</option>)}
+                {concernOptions.map((c) => <option key={c}>{c}</option>)}
               </select>
             </div>
             <div className="col-span-2 flex flex-col gap-1.5">

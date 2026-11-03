@@ -16,10 +16,11 @@ export default async function ResultsAdmin({ searchParams }: { searchParams: SP 
   const tab = ["inbox", "DRAFT", "PUBLISHED", "HIDDEN"].includes(sp.tab ?? "") ? sp.tab! : "inbox";
   const q = (sp.q ?? "").trim();
   const page = Math.max(1, Number(sp.page) || 1);
-  const [inboxCount, counts, featuredCount] = await Promise.all([
+  const [inboxCount, counts, featuredCount, concerns] = await Promise.all([
     db.resultUpload.count(),
     db.result.groupBy({ by: ["status"], _count: true }),
     db.result.count({ where: { featured: true } }),
+    db.concern.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, name: true } }),
   ]);
   const count = (s: ResultStatus) => counts.find((c) => c.status === s)?._count ?? 0;
   const tabs: [string, string, number][] = [
@@ -98,6 +99,15 @@ export default async function ResultsAdmin({ searchParams }: { searchParams: SP 
                 <form action={updateResult.bind(null, r.id)} className="grid grid-cols-[1fr_80px] gap-2">
                   <div><label htmlFor={`pi-${r.id}`} className="a-label">Patient ID</label><input id={`pi-${r.id}`} name="patientId" defaultValue={r.patientId} className="a-input" /></div>
                   <div><label htmlFor={`so-${r.id}`} className="a-label">Order</label><input id={`so-${r.id}`} name="sortOrder" inputMode="numeric" defaultValue={r.sortOrder} className="a-input" /></div>
+                  <fieldset className="col-span-2">
+                    <legend className="a-label">Health concerns</legend>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                      {concerns.map((c) => (
+                        <label key={c.id} className="flex items-center gap-1.5 text-sm"><input type="checkbox" name="concerns" value={c.id} defaultChecked={r.concernIds.includes(c.id)} className="h-4 w-4 accent-[#2e6b47]" />{c.name}</label>
+                      ))}
+                    </div>
+                    <p className="a-help">The result also appears on these concern pages.</p>
+                  </fieldset>
                   <label className="col-span-2 flex items-center gap-2 text-sm"><input type="checkbox" name="consent" defaultChecked={r.consent} className="h-5 w-5 accent-[#2e6b47]" />Customer gave permission</label>
                   <div className="col-span-2"><SubmitButton className="a-btn-ghost h-9">Save</SubmitButton></div>
                 </form>

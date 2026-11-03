@@ -3,7 +3,8 @@ import { db } from "@/lib/db";
 import { CONCERN_ICONS, iconPath } from "@/lib/icons";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { ConfirmButton, SubmitButton } from "@/components/admin/ui";
-import { deleteConcern, saveConcern } from "./actions";
+import { deleteConcern, saveConcern, saveConcernContent } from "./actions";
+import { FaqFields } from "@/components/admin/FaqFields";
 
 function IconSelect({ value, id }: { value?: string; id: string }) {
   return (
@@ -45,7 +46,22 @@ export default async function ConcernsPage() {
             <form action={deleteConcern.bind(null, c.id)}>
               <ConfirmButton message={`Delete “${c.name}”? Products stay, but lose this concern.`}>Delete</ConfirmButton>
             </form>
-            <p className="w-full text-xs text-[#56685d]">{c._count.products} products</p>
+            <p className="w-full text-xs text-[#56685d]">{c._count.products} products · <a href={`/concern/${c.slug}`} target="_blank" className="font-medium text-[#2e6b47]">View page ↗</a></p>
+            <details className="w-full rounded-xl bg-[#f7faf8] p-3">
+              <summary className="cursor-pointer text-sm font-semibold">Page content (intro and questions)</summary>
+              <form action={saveConcernContent.bind(null, c.id)} className="mt-3 flex flex-col gap-3">
+                <div>
+                  <label htmlFor={`in-${c.id}`} className="a-label">Introduction</label>
+                  <textarea id={`in-${c.id}`} name="intro" rows={4} defaultValue={c.intro} className="a-textarea" placeholder={`A few lines about ${c.name} in Ayurveda`} />
+                  <p className="a-help">Shown at the top of the {c.name} page. Leave a blank line between paragraphs.</p>
+                </div>
+                <div>
+                  <p className="a-label">Questions</p>
+                  <FaqFields initial={(Array.isArray(c.faqs) ? c.faqs : []) as { q: string; a: string }[]} />
+                </div>
+                <div><SubmitButton>Save page content</SubmitButton></div>
+              </form>
+            </details>
           </div>
         ))}
       </div>

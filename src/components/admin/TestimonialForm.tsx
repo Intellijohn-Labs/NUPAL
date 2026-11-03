@@ -6,9 +6,9 @@ import { parseVideo, youtubeThumb } from "@/lib/video";
 import { ImageField } from "./ImageField";
 import { SubmitButton } from "./ui";
 
-type T = { id: string; name: string; place: string; quote: string; videoUrl: string; thumbnail: string | null; productId: string | null; active: boolean; sortOrder: number };
+type T = { id: string; name: string; place: string; quote: string; videoUrl: string; thumbnail: string | null; productId: string | null; concernIds: string[]; active: boolean; sortOrder: number };
 
-export function TestimonialForm({ t, products, next = 0 }: { t?: T; products: { id: string; name: string }[]; next?: number }) {
+export function TestimonialForm({ t, products, concerns = [], next = 0 }: { t?: T; products: { id: string; name: string }[]; concerns?: { id: string; name: string }[]; next?: number }) {
   const [msg, action] = useActionState(saveTestimonial.bind(null, t?.id ?? null), null);
   const [url, setUrl] = useState(t?.videoUrl ?? "");
   const ref = useRef<HTMLFormElement>(null);
@@ -45,6 +45,17 @@ export function TestimonialForm({ t, products, next = 0 }: { t?: T; products: { 
           </select>
         </div>
       </div>
+      {concerns.length > 0 && (
+        <fieldset>
+          <legend className="a-label">Health concerns (optional)</legend>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {concerns.map((c) => (
+              <label key={c.id} className="flex items-center gap-1.5 text-sm"><input type="checkbox" name="concerns" value={c.id} defaultChecked={t?.concernIds.includes(c.id)} className="h-4 w-4 accent-[#2e6b47]" />{c.name}</label>
+            ))}
+          </div>
+          <p className="a-help">The video also appears on these concern pages.</p>
+        </fieldset>
+      )}
       <div><p className="a-label">Cover image (optional)</p><ImageField name="thumb" folder="testimonials" multiple={false} existing={t?.thumbnail ? [t.thumbnail] : []} help="YouTube’s own thumbnail is used if empty" /></div>
       <div className="flex flex-wrap items-end gap-4">
         <div className="w-24"><label htmlFor={`o-${id}`} className="a-label">Order</label><input id={`o-${id}`} name="sortOrder" inputMode="numeric" defaultValue={t?.sortOrder ?? next} className="a-input" /></div>

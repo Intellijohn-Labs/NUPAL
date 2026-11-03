@@ -6,6 +6,7 @@ import { SubmitButton } from "./ui";
 
 type Banner = {
   id: string;
+  eyebrow: string;
   title: string;
   subtitle: string;
   ctaLabel: string;
@@ -65,7 +66,8 @@ export function BannerForm({ b, next, action }: { b?: Banner; next: number; acti
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="flex flex-col gap-4">
-            <div><label htmlFor={`t-${id}`} className="a-label">Headline</label><input id={`t-${id}`} name="title" required defaultValue={b?.title} className="a-input" /></div>
+            <div><label htmlFor={`e-${id}`} className="a-label">Small line above the headline (optional)</label><input id={`e-${id}`} name="eyebrow" defaultValue={b?.eyebrow} placeholder="e.g. Generations of Ayurvedic care · Kochi" className="a-input" /></div>
+            <div><label htmlFor={`t-${id}`} className="a-label">Headline</label><textarea id={`t-${id}`} name="title" required rows={2} defaultValue={b?.title} className="a-textarea" /><p className="a-help">The last line is shown in gold on the green background — use a line break (Enter) to choose where it starts.</p></div>
             <div><label htmlFor={`s-${id}`} className="a-label">Supporting text</label><textarea id={`s-${id}`} name="subtitle" rows={3} defaultValue={b?.subtitle} className="a-textarea" /></div>
           </div>
           <div className="flex flex-col gap-4">
