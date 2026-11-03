@@ -11,6 +11,7 @@ import { VideoTestimonials } from "@/components/store/VideoTestimonials";
 import { HomeReviews } from "@/components/store/HomeReviews";
 import { ResultsSection } from "@/components/store/ResultsSection";
 import { Reveal } from "@/components/store/Reveal";
+import { WhyStrip } from "@/components/store/WhyStrip";
 
 export default async function HomePage() {
   const [banners, concerns, products, doctors, types, videos, settings] = await Promise.all([
@@ -119,23 +120,7 @@ export default async function HomePage() {
 
       <HomeReviews />
 
-      {why.length > 0 && (
-        <section className="border-b border-line" aria-label="Why NUPAL">
-          <div className={`container-x grid gap-6 py-10 sm:grid-cols-2 ${why.length >= 4 ? "lg:grid-cols-4" : why.length === 3 ? "lg:grid-cols-3" : ""}`}>
-            {why.map((w, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#567459" strokeWidth="1.4" aria-hidden="true" className="mt-0.5 shrink-0">
-                  <path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l8-8" />
-                </svg>
-                <div>
-                  <p className="font-display text-lg">{w.title}</p>
-                  {w.text && <p className="text-sm text-muted">{w.text}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <WhyStrip points={why} />
     </>
   );
 }

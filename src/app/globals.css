@@ -99,6 +99,8 @@
 .hero-float { animation: herofloat 6s ease-in-out infinite; }
 @keyframes herosway { 0%, 100% { rotate: 0deg; } 50% { rotate: 3deg; } }
 .hero-sway { transform-origin: 50% 100%; animation: herosway 8s ease-in-out infinite; }
+@keyframes dnafloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(1.5deg)}}
+.dna-float{animation:dnafloat 14s ease-in-out infinite;will-change:transform;}
 @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .fade-in { animation: fadein .5s ease both; }
 .no-scrollbar { scrollbar-width: none; }

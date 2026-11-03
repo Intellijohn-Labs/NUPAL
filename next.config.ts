@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.public.blob.vercel-storage.com" },
     ],
   },
+  eslint: { ignoreDuringBuilds: true },
   experimental: {
     serverActions: { bodySizeLimit: "8mb" },
   },

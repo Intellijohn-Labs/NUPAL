@@ -22,7 +22,7 @@ export default async function CmsPage({ params }: { params: P }) {
 
   const content = (
     <>
-      {page.content.trim() && (
+      {page.content.trim() && !page.blocks.length && (
         <div className="prose-nupal text-[17px]">
           <ReactMarkdown>{page.content}</ReactMarkdown>
         </div>
@@ -65,18 +65,31 @@ export default async function CmsPage({ params }: { params: P }) {
           <h1 className="hero-in text-[clamp(36px,4.8vw,62px)] leading-[1.05]" style={{ animationDelay: ".08s" }}>{page.title}</h1>
         </div>
       </header>
-      {withNav && (
-        <nav aria-label="On this page" className="sticky top-[129px] z-30 border-b border-line bg-white/95 backdrop-blur lg:top-[121px]">
-          <ul className="container-x no-scrollbar flex gap-1 overflow-x-auto py-2">
-            {sections.map((s) => (
-              <li key={s.id} className="shrink-0">
-                <a href={`#${s.anchor}`} className="block rounded-full px-4 py-2 text-[15px] text-muted transition-colors hover:bg-cream hover:text-ink">{s.title}</a>
-              </li>
+      {withNav ? (
+        <div className="container-x grid items-start gap-10 py-14 sm:py-20 lg:grid-cols-[240px_1fr] lg:gap-14">
+          <nav aria-label="On this page" className="top-[137px] hidden flex-col gap-1 lg:sticky lg:flex">
+            <p className="mb-2 text-xs font-medium uppercase tracking-[.16em] text-muted">On this page</p>
+            {sections.map((sc) => (
+              <a key={sc.id} href={`#${sc.anchor}`}
+                className="rounded-lg px-3 py-2 text-[15px] text-muted transition-colors hover:bg-cream hover:text-ink">
+                {sc.title}
+              </a>
             ))}
-          </ul>
-        </nav>
+          </nav>
+          {/* mobile: horizontal pill row */}
+          <nav aria-label="On this page" className="no-scrollbar -mx-4 flex overflow-x-auto px-4 pb-6 lg:hidden">
+            {sections.map((sc) => (
+              <a key={sc.id} href={`#${sc.anchor}`}
+                className="mr-2 shrink-0 rounded-full border border-line bg-cream px-4 py-2 text-[14px] text-muted">
+                {sc.title}
+              </a>
+            ))}
+          </nav>
+          <div className="flex min-w-0 flex-col gap-20 sm:gap-24">{content}</div>
+        </div>
+      ) : (
+        <div className={`container-x flex flex-col gap-20 py-14 sm:gap-24 sm:py-20 ${page.blocks.length ? "" : "max-w-[760px]"}`}>{content}</div>
       )}
-      <div className={`container-x flex flex-col gap-20 py-14 sm:gap-24 sm:py-20 ${page.blocks.length ? "" : "max-w-[760px]"}`}>{content}</div>
     </article>
   );
 }
