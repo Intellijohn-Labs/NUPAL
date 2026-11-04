@@ -154,7 +154,7 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
             </Link>
           </div>
         ) : (
-          <div className="container-x grid items-center gap-10 pb-24 pt-12 sm:pt-16 md:min-h-[560px] md:grid-cols-[1.05fr_.95fr]">
+          <div className="container-x grid grid-cols-1 items-center gap-10 pb-24 pt-12 sm:pt-16 md:min-h-[560px] md:grid-cols-[1.05fr_.95fr]">
             <div className="flex flex-col items-start">
               {b.eyebrow && (
                 <p className={`hero-in text-xs font-medium uppercase tracking-[.18em] ${t.eyebrow}`}>{b.eyebrow}</p>

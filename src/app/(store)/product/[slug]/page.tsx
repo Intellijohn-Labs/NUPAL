@@ -53,7 +53,7 @@ export default async function ProductPage({ params, searchParams }: { params: P;
         <span className="text-ink">{p.name}</span>
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <ProductGallery images={p.images} name={p.name} type={p.type} videoUrl={p.videoUrl} />
         <div className="flex flex-col gap-5">
           <div>
@@ -99,7 +99,7 @@ export default async function ProductPage({ params, searchParams }: { params: P;
           {p.benefits.length > 0 && (
             <div>
               <h2 className="mb-3 text-xl">Benefits</h2>
-              <ul className="grid gap-2 sm:grid-cols-2">
+              <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {p.benefits.map((b) => (
                   <li key={b} className="flex items-start gap-2 rounded-xl border border-line px-3 py-2.5 text-[15px]">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#567459" strokeWidth="2" className="mt-0.5 shrink-0" aria-hidden="true">
@@ -114,7 +114,7 @@ export default async function ProductPage({ params, searchParams }: { params: P;
         </div>
       </div>
 
-      <div className="mt-14 grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex flex-col gap-8">
           {p.description && (
             <section>

@@ -84,7 +84,7 @@ export function Header({ concerns, types }: { concerns: Concern[]; types: string
             <summary className="flex cursor-pointer list-none items-center gap-1 py-2 lg:py-0">
               Shop by concern <span aria-hidden="true" className="text-xs">▾</span>
             </summary>
-            <div className="grid gap-1 py-2 pl-3 lg:absolute lg:left-0 lg:top-full lg:z-50 lg:w-[460px] lg:grid-cols-2 lg:rounded-xl lg:border lg:border-line lg:bg-white lg:p-3 lg:shadow-lg">
+            <div className="grid grid-cols-1 gap-1 py-2 pl-3 lg:absolute lg:left-0 lg:top-full lg:z-50 lg:w-[460px] lg:grid-cols-2 lg:rounded-xl lg:border lg:border-line lg:bg-white lg:p-3 lg:shadow-lg">
               {concerns.map((c) => (
                 <Link key={c.slug} href={`/concern/${c.slug}`} className="rounded-lg px-2 py-2 font-normal hover:bg-mist" onClick={pick}>
                   {c.name}

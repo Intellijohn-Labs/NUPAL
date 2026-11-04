@@ -32,7 +32,7 @@ export async function ProductReviews({ productId, productName, slug, avg, count,
         <h2 id="reviews-h" className="text-[clamp(26px,3vw,36px)]">Customer reviews</h2>
         {count > 0 && <Link href="/reviews" className="text-sm font-medium text-sage hover:underline">Reviews of all products</Link>}
       </div>
-      <div className="grid items-start gap-10 lg:grid-cols-[320px_1fr]">
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[320px_1fr]">
         <div className="flex flex-col gap-4">
           {count > 0 ? (
             <RatingSummary avg={avg} count={count} byStar={byStar} hrefFor={(s) => href(s)} active={stars} />

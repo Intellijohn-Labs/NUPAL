@@ -21,7 +21,7 @@ export async function HomeReviews() {
           <h2 id="home-reviews" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight">What our customers say</h2>
         </div>
       </Reveal>
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {reviews.map((r, i) => (
           <Reveal key={r.id} index={i % 3} className="h-full">
             <ReviewCard r={r} clamp />

@@ -167,7 +167,7 @@ export function ProductCard({ p }: { p: CardProduct }) {
           v && <span className="mx-auto mt-2.5 rounded-full border border-line bg-[#F4F8F2] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide">{v.label}</span>
         )}
 
-        <div className="mt-auto grid gap-2 pt-3.5 sm:grid-cols-[auto_1fr]">
+        <div className="mt-auto grid grid-cols-1 gap-2 pt-3.5 sm:grid-cols-[auto_1fr]">
           <div className="flex h-11 items-center justify-between rounded-xl border border-line bg-[#F7FAF6]" role="group" aria-label={`Quantity of ${p.name}`}>
             <button type="button" aria-label="Decrease quantity" disabled={out} onClick={() => setQty((q) => Math.max(1, q - 1))} className="h-11 w-9 text-lg">−</button>
             <span aria-live="polite" className="min-w-5 text-center font-medium">{qty}</span>

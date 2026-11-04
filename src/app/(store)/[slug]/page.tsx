@@ -35,7 +35,7 @@ export default async function CmsPage({ params }: { params: P }) {
       {socials.length > 0 && (
         <section aria-labelledby="follow">
           <h2 id="follow" className="mb-4 text-2xl">Follow us</h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {socials.map((s) => (
               <li key={s.id}>
                 <a href={s.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 rounded-2xl border border-line p-4 transition-colors hover:border-sage hover:bg-cream">
@@ -66,7 +66,7 @@ export default async function CmsPage({ params }: { params: P }) {
         </div>
       </header>
       {withNav ? (
-        <div className="container-x grid items-start gap-10 py-14 sm:py-20 lg:grid-cols-[240px_1fr] lg:gap-14">
+        <div className="container-x grid grid-cols-1 items-start gap-10 py-14 sm:py-20 lg:grid-cols-[240px_1fr] lg:gap-14">
           <nav aria-label="On this page" className="top-[137px] hidden flex-col gap-1 lg:sticky lg:flex">
             <p className="mb-2 text-xs font-medium uppercase tracking-[.16em] text-muted">On this page</p>
             {sections.map((sc) => (

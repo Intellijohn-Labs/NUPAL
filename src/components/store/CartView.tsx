@@ -26,7 +26,7 @@ export function CartView({ shippingFee, freeShippingAbove }: { shippingFee: numb
   return (
     <div className="container-x py-10 sm:py-14">
       <h1 className="mb-8 text-[clamp(30px,3.6vw,44px)]">Your cart</h1>
-      <div className="grid items-start gap-8 lg:grid-cols-[1fr_380px]">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_380px]">
         <ul className="flex flex-col gap-3">
           {items.map((i) => (
             <li key={i.variantId} className="flex flex-wrap items-center gap-4 rounded-2xl border border-line p-4">

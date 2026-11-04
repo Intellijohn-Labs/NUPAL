@@ -53,7 +53,7 @@ export default async function HomePage() {
               <path d="M40 160L280 30l240 130M10 200l90-48h360l90 48M100 200v100M180 200v100M380 200v100M460 200v100M60 300h440M230 300v-70h100v70" />
             </g>
           </svg>
-          <div className="container-x relative grid items-center gap-12 py-20 sm:py-24 lg:grid-cols-2 lg:gap-14">
+          <div className="container-x relative grid grid-cols-1 items-center gap-12 py-20 sm:py-24 lg:grid-cols-2 lg:gap-14">
             <div className="flex flex-col items-start">
               <Reveal><p className="text-xs font-medium uppercase tracking-[.18em] text-gold">Personal guidance</p></Reveal>
               <Reveal index={1}>

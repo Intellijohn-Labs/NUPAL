@@ -59,9 +59,9 @@ export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCh
   return (
     <div className="container-x py-10 sm:py-14">
       <h1 className="mb-8 text-[clamp(30px,3.6vw,44px)]">Checkout</h1>
-      <form action={submit} className="grid items-start gap-8 lg:grid-cols-[1fr_380px]">
+      <form action={submit} className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_380px]">
         <div className="flex flex-col gap-6">
-          <fieldset className="grid gap-4 rounded-2xl border border-line p-5 sm:grid-cols-2">
+          <fieldset className="grid grid-cols-1 gap-4 rounded-2xl border border-line p-5 sm:grid-cols-2">
             <legend className="px-1 font-display text-xl">Delivery details</legend>
             {FIELDS.map((f) => (
               <div key={f.name} className={`flex flex-col gap-1.5 ${f.full ? "sm:col-span-2" : ""}`}>

@@ -34,7 +34,7 @@ export function PageBlock({ b }: { b: Block }) {
           </Reveal>
         )}
         {(t.body || t.name) && (
-          <div className="mt-10 grid items-end gap-8 md:grid-cols-[1.5fr_.5fr]">
+          <div className="mt-10 grid grid-cols-1 items-end gap-8 md:grid-cols-[1.5fr_.5fr]">
             <Reveal from="left" className="prose-nupal text-[18px] leading-8">
               <ReactMarkdown>{t.body ?? ""}</ReactMarkdown>
             </Reveal>
@@ -86,7 +86,7 @@ export function PageBlock({ b }: { b: Block }) {
           {items.map((m, i) => {
             const right = i % 2 === 1;
             return (
-              <li key={i} className="relative grid pl-14 md:grid-cols-2 md:pl-0">
+              <li key={i} className="relative grid grid-cols-1 pl-14 md:grid-cols-2 md:pl-0">
                 <span aria-hidden="true" className="absolute left-[11px] top-1 z-10 h-[18px] w-[18px] rounded-full border-4 border-white bg-gold shadow md:left-1/2 md:-ml-[9px]" />
                 <Reveal from={right ? "right" : "left"} className={right ? "md:col-start-2 md:pl-12" : "md:pr-12 md:text-right"}>
                   <p className="font-display text-3xl text-gold">{m.year}</p>
@@ -156,7 +156,7 @@ export function PageBlock({ b }: { b: Block }) {
     return (
       <Reveal>
         {heading}
-        <figure className="m-0 grid items-start gap-8 rounded-3xl bg-cream p-6 sm:p-8 md:grid-cols-[220px_1fr]">
+        <figure className="m-0 grid grid-cols-1 items-start gap-8 rounded-3xl bg-cream p-6 sm:p-8 md:grid-cols-[220px_1fr]">
           <div className="flex flex-col items-center gap-3 text-center md:items-start md:text-left">
             {m.photo ? <img src={m.photo} alt={m.name ?? ""} className="aspect-[4/5] w-44 rounded-2xl object-cover md:w-full" /> : m.name ? <Initials name={m.name} size={120} /> : null}
           </div>
@@ -180,7 +180,7 @@ export function PageBlock({ b }: { b: Block }) {
     return (
       <div>
         {heading && <Reveal>{heading}</Reveal>}
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {people.map((p, i) => (
             <li key={p.name + i}>
               <Reveal index={i % 3} className="h-full">

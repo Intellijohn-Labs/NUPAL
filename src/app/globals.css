@@ -26,6 +26,11 @@
   h1, h2, h3 { @apply font-display font-normal; text-wrap: balance; }
   :focus-visible { outline: 2px solid var(--color-sage); outline-offset: 2px; }
   input, select, textarea { font: inherit; }
+  /* Phones and tablets: never let the page scroll sideways. `clip` (with `hidden` as a fallback)
+     keeps the sticky header working. Desktop is left untouched. */
+  @media (max-width: 1023.98px) {
+    body { overflow-x: hidden; overflow-x: clip; }
+  }
 }
 
 @utility container-x {

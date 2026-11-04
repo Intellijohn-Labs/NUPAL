@@ -124,11 +124,13 @@ export function BookingWidget({ doctors, types, initialConcern = "" }: { doctors
                     <path d={ICONS[t.key] ?? ICONS.video} />
                   </svg>
                 </span>
-                <span className="flex-1">
+                <span className="min-w-0 flex-1">
                   <span className="block text-[17px] font-medium">{t.name}</span>
                   <span className="text-sm text-muted">{t.durationMin} min{t.description ? ` · ${t.description}` : ""}</span>
+                  {/* Phones: fee sits under the details so it doesn't squeeze the title */}
+                  <span className="mt-1 block text-sm font-medium text-sage-dark sm:hidden">{feeText(t.fee)}</span>
                 </span>
-                <span className="text-right text-sm font-medium text-sage-dark">{feeText(t.fee)}</span>
+                <span className="hidden text-right text-sm font-medium text-sage-dark sm:block">{feeText(t.fee)}</span>
               </button>
             ))}
           </div>

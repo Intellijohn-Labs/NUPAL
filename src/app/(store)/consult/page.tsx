@@ -24,14 +24,14 @@ export default async function ConsultPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="bg-cream">
-      <div className="container-x grid items-start gap-10 py-10 sm:py-14 lg:grid-cols-[1fr_520px]">
+      <div className="container-x grid grid-cols-1 items-start gap-10 py-10 sm:py-14 lg:grid-cols-[1fr_520px]">
         <div className="flex flex-col gap-6">
           <h1 className="text-[clamp(34px,4.2vw,54px)] leading-[1.1]">Consult an Ayurvedic doctor</h1>
           <p className="max-w-[54ch] text-lg leading-8 text-muted">
             Get personal advice for your health concern and the right medicines for you — by video, phone or at our clinic. Booking takes under a
             minute and needs no account.
           </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {doctors.map((d) => (
               <div key={d.id} className="flex items-center gap-4 rounded-2xl border border-line bg-white p-4">
                 <DoctorPhoto src={d.photo} name={d.name} size={72} />
@@ -43,7 +43,7 @@ export default async function ConsultPage({ searchParams }: { searchParams: Prom
               </div>
             ))}
           </div>
-          <ol className="grid gap-3 sm:grid-cols-2">
+          <ol className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {["Choose a doctor and how to meet", "Pick a date and open time", "Share your name, WhatsApp number and concern", "Get confirmation on WhatsApp"].map((s, i) => (
               <li key={s} className="flex items-start gap-3 rounded-xl bg-white p-4">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold text-sm font-semibold text-[#1b1608]">{i + 1}</span>

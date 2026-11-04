@@ -12,7 +12,7 @@ type Props = {
 export function Footer({ concerns, pages, settings, socials }: Props) {
   return (
     <footer className="bg-forest text-cream">
-      <div className="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container-x grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="flex flex-col gap-4">
           <Logo light className="h-12 w-auto" />
           <p className="text-[15px] leading-7 text-[#c9d4c8]">
