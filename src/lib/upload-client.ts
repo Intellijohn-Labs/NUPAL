@@ -11,7 +11,38 @@ export type ImageOptions = {
    * - a pack shot on white has its white border trimmed and only a hairline margin added.
    */
   square?: boolean;
+  /** Banners: cut off plain black or white bars at the edges (padding added when exporting). */
+  trimBars?: boolean;
 };
+
+/** Finds solid black/white bars along each edge (letterbox/pillarbox padding) and returns the box inside them. */
+function barBox(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const { data } = ctx.getImageData(0, 0, w, h);
+  const px = (x: number, y: number) => (y * w + x) * 4;
+  const plain = (i: number) => {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    const flat = Math.max(r, g, b) - Math.min(r, g, b) < 14;
+    return flat && (r < 26 || r > 242);
+  };
+  const lineIsBar = (n: number, at: (k: number) => number) => {
+    let bars = 0;
+    const step = Math.max(1, Math.floor(n / 120));
+    let seen = 0;
+    for (let k = 0; k < n; k += step, seen++) if (plain(at(k))) bars++;
+    return bars / seen > 0.97;
+  };
+  let left = 0, right = w - 1, top = 0, bottom = h - 1;
+  while (left < w * 0.3 && lineIsBar(h, (k) => px(left, k))) left++;
+  while (right > w * 0.7 && lineIsBar(h, (k) => px(right, k))) right--;
+  while (top < h * 0.3 && lineIsBar(w, (k) => px(k, top))) top++;
+  while (bottom > h * 0.7 && lineIsBar(w, (k) => px(k, bottom))) bottom--;
+  // ignore hairlines; only trim real bars (at least 1% of the side)
+  if (left < w * 0.01) left = 0;
+  if (w - 1 - right < w * 0.01) right = w - 1;
+  if (top < h * 0.01) top = 0;
+  if (h - 1 - bottom < h * 0.01) bottom = h - 1;
+  return { x: left, y: top, w: right - left + 1, h: bottom - top + 1 };
+}
 
 async function loadBitmap(file: File) {
   return createImageBitmap(file, { imageOrientation: "from-image" } as ImageBitmapOptions);
@@ -39,7 +70,7 @@ function contentBox(ctx: CanvasRenderingContext2D, w: number, h: number) {
 
 /** Shrinks a photo in the browser (keeps orientation) so uploads are fast and pages load quickly. */
 export async function compressImage(file: File, opts: ImageOptions | number = {}): Promise<Blob> {
-  const { maxSide = 1600, square = false } = typeof opts === "number" ? { maxSide: opts } : opts;
+  const { maxSide = 1600, square = false, trimBars = false } = typeof opts === "number" ? { maxSide: opts } : opts;
   if (file.type === "image/svg+xml") return file;
   try {
     const bmp = await loadBitmap(file);
@@ -49,9 +80,20 @@ export async function compressImage(file: File, opts: ImageOptions | number = {}
     let canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
-    const ctx = canvas.getContext("2d", { willReadFrequently: square })!;
+    const ctx = canvas.getContext("2d", { willReadFrequently: square || trimBars })!;
     ctx.drawImage(bmp, 0, 0, w, h);
     bmp.close();
+
+    if (trimBars) {
+      const box = barBox(ctx, w, h);
+      if (box.w < w || box.h < h) {
+        const cut = document.createElement("canvas");
+        cut.width = box.w;
+        cut.height = box.h;
+        cut.getContext("2d")!.drawImage(canvas, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+        canvas = cut;
+      }
+    }
 
     if (square) {
       const box = contentBox(ctx, w, h);

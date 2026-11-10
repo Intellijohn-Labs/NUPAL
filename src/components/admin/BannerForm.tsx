@@ -47,11 +47,11 @@ export function BannerForm({ b, next, action }: { b?: Banner; next: number; acti
         <div className="grid gap-4 lg:grid-cols-2">
           <div>
             <p className="a-label">Desktop image</p>
-            <ImageField name="desktop" folder="banners" maxSide={2200} multiple={false} existing={b?.imageDesktop ? [b.imageDesktop] : []} help={kind === "photo" ? "Wide, about 1920 × 1080 px, with open space on the left for the writing" : "Wide, about 1920 × 720 px"} />
+            <ImageField name="desktop" folder="banners" maxSide={2200} trimBars multiple={false} existing={b?.imageDesktop ? [b.imageDesktop] : []} help={kind === "photo" ? "2200 × 1100 px (2:1). Keep the left 45% plain — the writing goes there. Keep products away from the outer edges." : "2200 × 1100 px (2:1), writing included in the picture. Keep everything important away from the outer edges."} />
           </div>
           <div>
             <p className="a-label">Mobile image (recommended)</p>
-            <ImageField name="mobile" folder="banners" maxSide={1600} multiple={false} existing={b?.imageMobile ? [b.imageMobile] : []} help={kind === "photo" ? "Tall, about 1080 × 1920 px. Phones show the middle of it above the writing." : "Tall, about 1080 × 1350 px. Without it, phones show the desktop image smaller."} />
+            <ImageField name="mobile" folder="banners" maxSide={1600} trimBars multiple={false} existing={b?.imageMobile ? [b.imageMobile] : []} help={kind === "photo" ? "1080 × 1920 px (9:16). Phones show the middle square of it above the writing — keep the products in the centre." : "1080 × 1920 px (9:16), writing included. Keep everything important away from the outer edges."} />
           </div>
           {kind === "image" && (<>
           <div>

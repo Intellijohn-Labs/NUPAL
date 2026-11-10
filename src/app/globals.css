@@ -156,3 +156,8 @@
 
 /* Safety net: nothing may widen the page sideways on phones (swipe rows scroll inside themselves). */
 html, body { overflow-x: clip; }
+
+/* Offer bar ticker: two identical tracks slide left by one track width, then loop. */
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.ticker { animation: ticker linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ticker { animation: none; } }

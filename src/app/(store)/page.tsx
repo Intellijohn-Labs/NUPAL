@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
 import { cardInclude, toCard } from "@/lib/catalog";
 import { BannerSlider } from "@/components/store/BannerSlider";
-import { ConcernCards } from "@/components/store/ConcernCards";
-import { Bestsellers } from "@/components/store/Bestsellers";
+import { ConcernShelf } from "@/components/store/ConcernShelf";
 import { Collections, type Collection } from "@/components/store/Collections";
 import { CustomerStories } from "@/components/store/CustomerStories";
 import { FinalCta } from "@/components/store/FinalCta";
@@ -45,9 +44,12 @@ export default async function HomePage() {
     <div className="relative">
       <BannerSlider banners={banners} products={heroProducts} trust={settings.heroChips} />
 
-      <ConcernCards concerns={concerns.map((c) => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon, tagline: c.tagline }))} />
-
-      <Bestsellers products={products.slice(0, 4).map(toCard)} joinBelow={bestJoinResults} />
+      <ConcernShelf
+        concerns={concerns.map((c) => ({ id: c.id, name: c.name, slug: c.slug, icon: c.icon, tagline: c.tagline }))}
+        products={products.map(toCard)}
+        bestsellers={products.slice(0, 4).map(toCard)}
+        joinBelow={bestJoinResults}
+      />
 
       <ResultsSection joinAbove={bestJoinResults} joinBelow={resultsJoinConsult} />
 
