@@ -58,7 +58,7 @@ export function ProductGallery({ images, name, type, videoUrl }: { images: strin
         </div>
       )}
 
-      <div className="relative flex aspect-square flex-1 items-center justify-center overflow-hidden rounded-3xl bg-[#f4f1ea]">
+      <div className="relative flex aspect-square flex-1 items-center justify-center overflow-hidden rounded-3xl bg-white">
         {isVideo || (!images.length && video && slots === 1) ? (
           <button type="button" onClick={openVideo} aria-label={`Play ${name} video`} className="group absolute inset-0 flex items-center justify-center bg-forest">
             {videoThumb && <img src={videoThumb} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}

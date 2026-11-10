@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { saveBlock } from "@/app/admin/(panel)/pages/block-actions";
-import { BLOCK_LABELS, type CardsData, type GalleryData, type IntroData, type Logo, type LogosData, type MessageData, type PeopleData, type Person, type StatsData, type TextData, type TimelineData } from "@/lib/blocks";
+import { BLOCK_LABELS, type DuoData, type FounderData, type CardsData, type GalleryData, type IntroData, type Logo, type LogosData, type MessageData, type PeopleData, type Person, type StatsData, type TextData, type TimelineData } from "@/lib/blocks";
 import { ImageField } from "./ImageField";
 import { SubmitButton } from "./ui";
 
@@ -26,6 +26,18 @@ export function BlockEditor({ block, pageSlug }: { block: Block; pageSlug: strin
       </div>
 
       {block.type === "intro" && <IntroFields d={d as IntroData} />}
+      {block.type === "founder" && <FounderFields d={d as FounderData} />}
+      {block.type === "duo" && (
+        <>
+          <div><label className="a-label">Small line above the title (optional)</label><input name="eyebrow" defaultValue={(d as DuoData).eyebrow ?? ""} placeholder="e.g. Vision & mission" className="a-input" /></div>
+          <SimpleRows
+            noun="card"
+            cols={[{ key: "title", label: "Card title", ph: "A vision that transcended time" }, { key: "text", label: "Text", ph: "Two or three sentences", long: true }]}
+            initial={((d as DuoData).cards ?? []) as Record<string, string>[]}
+            help="Two cards side by side. The second one is shown on dark green."
+          />
+        </>
+      )}
       {block.type === "stats" && (
         <SimpleRows
           noun="number"
@@ -109,13 +121,13 @@ function MessageFields({ d }: { d: MessageData }) {
   );
 }
 
-type Row = { k: string; name: string; role?: string; bio?: string; url?: string; img?: string | null };
+type Row = { k: string; name: string; role?: string; qual?: string; bio?: string; url?: string; img?: string | null };
 
 function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | Logo)[] }) {
   const [rows, setRows] = useState<Row[]>(() =>
     initial.map((r) =>
       kind === "people"
-        ? { k: key(), name: r.name, role: (r as Person).role, bio: (r as Person).bio, img: (r as Person).photo ?? null }
+        ? { k: key(), name: r.name, role: (r as Person).role, qual: (r as Person).qual ?? "", bio: (r as Person).bio, img: (r as Person).photo ?? null }
         : { k: key(), name: r.name, url: (r as Logo).url, img: (r as Logo).image ?? null },
     ),
   );
@@ -138,11 +150,14 @@ function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | 
             <div className="grid gap-2 sm:grid-cols-2">
               <div><label className="a-label">{kind === "people" ? "Name" : "Organisation"}</label><input name="row_name" defaultValue={r.name} className="a-input" /></div>
               {kind === "people" ? (
-                <div><label className="a-label">Role</label><input name="row_role" defaultValue={r.role} placeholder="e.g. Managing Director" className="a-input" /></div>
+                <div><label className="a-label">Role</label><input name="row_role" defaultValue={r.role} placeholder="e.g. Director · Finance" className="a-input" /></div>
               ) : (
                 <div><label className="a-label">Website (optional)</label><input name="row_url" defaultValue={r.url} placeholder="https://…" className="a-input" /></div>
               )}
             </div>
+            {kind === "people" && (
+              <div><label className="a-label">Qualifications (optional)</label><input name="row_qual" defaultValue={r.qual} placeholder="e.g. BAMS" className="a-input" /></div>
+            )}
             {kind === "people" && (
               <div><label className="a-label">Short bio (optional)</label><textarea name="row_bio" rows={3} defaultValue={r.bio} className="a-textarea" /></div>
             )}
@@ -154,7 +169,7 @@ function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | 
           </div>
         </div>
       ))}
-      <button type="button" className="a-btn-ghost self-start" onClick={() => setRows((x) => [...x, { k: key(), name: "", role: "", bio: "", url: "", img: null }])}>
+      <button type="button" className="a-btn-ghost self-start" onClick={() => setRows((x) => [...x, { k: key(), name: "", role: "", qual: "", bio: "", url: "", img: null }])}>
         + Add {kind === "people" ? "person" : "logo"}
       </button>
     </div>
@@ -223,6 +238,23 @@ function SimpleRows({ cols, initial, noun, help }: { cols: Col[]; initial: Recor
         </div>
       ))}
       <button type="button" className="a-btn-ghost self-start" onClick={() => setRows((x) => [...x, { _k: key() }])}>+ Add {noun}</button>
+    </div>
+  );
+}
+
+function FounderFields({ d }: { d: FounderData }) {
+  return (
+    <div className="grid gap-4 lg:grid-cols-[1fr_1.5fr]">
+      <div className="flex flex-col gap-3">
+        <div><p className="a-label">Portrait</p><ImageField name="image" folder="pages" multiple={false} existing={d.image ? [d.image] : []} help="A portrait photo. It sits inside NUPAL’s DNA illustration." /></div>
+        <div><label className="a-label">Badge</label><input name="badge" defaultValue={d.badge ?? ""} placeholder="e.g. Vaidyavachaspathy" className="a-input" /></div>
+        <div><label className="a-label">Badge small line</label><input name="badgeSub" defaultValue={d.badgeSub ?? ""} placeholder="e.g. Ayurveda’s highest title" className="a-input" /></div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <div><label className="a-label">Small line above the title</label><input name="eyebrow" defaultValue={d.eyebrow ?? ""} placeholder="e.g. The founder" className="a-input" /></div>
+        <div><label className="a-label">Quote (optional)</label><textarea name="quote" rows={2} defaultValue={d.quote ?? ""} className="a-textarea" /></div>
+        <div><label className="a-label">Story</label><textarea name="body" rows={7} defaultValue={d.body ?? ""} className="a-textarea" /><p className="a-help">{MD_HELP}</p></div>
+      </div>
     </div>
   );
 }

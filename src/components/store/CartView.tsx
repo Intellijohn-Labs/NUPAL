@@ -26,11 +26,11 @@ export function CartView({ shippingFee, freeShippingAbove }: { shippingFee: numb
   return (
     <div className="container-x py-10 sm:py-14">
       <h1 className="mb-8 text-[clamp(30px,3.6vw,44px)]">Your cart</h1>
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_380px]">
+      <div className="grid items-start gap-8 lg:grid-cols-[1fr_380px]">
         <ul className="flex flex-col gap-3">
           {items.map((i) => (
             <li key={i.variantId} className="flex flex-wrap items-center gap-4 rounded-2xl border border-line p-4">
-              <Link href={`/product/${i.slug}`} className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f4f1ea]">
+              <Link href={`/product/${i.slug}`} className="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white">
                 {i.image ? <Image src={i.image} alt="" fill sizes="96px" className="bg-white object-contain p-1.5" /> : <ProductArt name={i.name} type={i.type} size={56} />}
               </Link>
               <div className="min-w-[140px] flex-1">

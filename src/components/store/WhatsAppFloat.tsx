@@ -3,7 +3,7 @@ import Link from "next/link";
 export function WhatsAppFloat({ number }: { number: string }) {
   const digits = number.replace(/\D/g, "");
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-6 right-6 z-50 hidden flex-col items-end gap-3 lg:flex">
       <Link
         href="/consult"
         className="hidden items-center gap-2 rounded-full bg-white py-2 pl-2 pr-4 text-sm font-medium shadow-[0_12px_30px_-12px_rgba(0,0,0,.45)] sm:flex"

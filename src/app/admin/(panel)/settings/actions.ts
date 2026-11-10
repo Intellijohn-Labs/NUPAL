@@ -19,6 +19,23 @@ export async function saveSettings(f: FormData) {
     gstin: str(f, "gstin").toUpperCase(),
     resultsCount: Math.max(0, int(f, "resultsCount", 10000)),
     resultsHook: str(f, "resultsHook"),
+    heritage: {
+      show: bool(f, "her_show"),
+      eyebrow: str(f, "her_eyebrow"),
+      title: str(f, "her_title"),
+      quote: str(f, "her_quote"),
+      body: str(f, "her_body"),
+      year: int(f, "her_year") || null,
+      stats: [0, 1, 2]
+        .map((i) => ({ value: str(f, `her_sv_${i}`).slice(0, 12), suffix: str(f, `her_ss_${i}`).slice(0, 4), label: str(f, `her_sl_${i}`) }))
+        .filter((s) => s.label),
+      certs: str(f, "her_certs").split(",").map((c) => c.trim()).filter(Boolean).slice(0, 6),
+      ctaLabel: str(f, "her_cta"),
+      ctaHref: str(f, "her_href"),
+    },
+    heroChips: [0, 1, 2].map((i) => str(f, `chip_${i}`)).filter(Boolean),
+    homeCollections: [0, 1].map((i) => ({ title: str(f, `col_t_${i}`), text: str(f, `col_x_${i}`), href: str(f, `col_h_${i}`) || "/shop" })).filter((c) => c.title),
+    footerLegal: str(f, "footerLegal"),
     whyPoints: [0, 1, 2, 3].map((i) => ({ title: str(f, `why_title_${i}`), text: str(f, `why_text_${i}`) })).filter((w) => w.title),
     shippingFee: int(f, "shippingFee"),
     freeShippingAbove: optInt(f, "freeShippingAbove"),

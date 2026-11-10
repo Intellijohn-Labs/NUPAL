@@ -4,6 +4,19 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { ProductCard, type CardProduct } from "./ProductCard";
 import { Reveal } from "./Reveal";
+import { TornEdge } from "./TornEdge";
+
+// Each concern gets its own colour from the Kerala palette (background tint, icon colour).
+const RING_COLOURS: [string, string][] = [
+  ["#E3F1DA", "#3E7B2C"],
+  ["#FEF1E9", "#B5562C"],
+  ["#FDE4E4", "#B23A3A"],
+  ["#E4DAFD", "#6B4FB0"],
+  ["#D9F0D4", "#2F7A3A"],
+  ["#FCE3EF", "#A73E73"],
+  ["#FFF0D6", "#A45F12"],
+  ["#E8EEF9", "#3E5F96"],
+];
 
 type P = CardProduct & { concernIds: string[] };
 type Concern = { id: string; name: string; slug: string; iconPath: string };
@@ -34,69 +47,71 @@ export function ConcernShop({ products, concerns }: { products: P[]; concerns: C
 
   return (
     <>
-      <nav aria-labelledby="find-care" className="bg-white pt-10 sm:pt-12">
-        <Reveal className="container-x">
-          <p className="text-xs font-medium uppercase tracking-[.18em] text-sage">Shop by health concern</p>
-          <h2 id="find-care" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight">Find care for…</h2>
+      <nav id="shop-by-concern" aria-labelledby="find-care" className="pt-8 sm:pt-10">
+        <Reveal className="container-x text-center">
+          <p className="text-xs font-semibold uppercase tracking-[.18em] text-brick">Shop by health concern</p>
+          <h2 id="find-care" className="mt-1.5 text-[clamp(28px,3.6vw,46px)] leading-tight">Find care for…</h2>
         </Reveal>
-        <div role="group" className="container-x no-scrollbar flex gap-1 overflow-x-auto py-5">
-          {items.map((c) => {
+        <div role="group" className="no-scrollbar container-x flex snap-x snap-mandatory gap-1 overflow-x-auto py-5">
+          {items.map((c, idx) => {
             const on = active === c.id;
+            const [tint, ink] = RING_COLOURS[idx % RING_COLOURS.length];
             return (
               <button
                 key={c.id}
                 type="button"
                 aria-pressed={on}
                 onClick={() => pick(c.id)}
-                className="group flex min-w-[104px] flex-1 flex-col items-center gap-2.5 rounded-xl px-2 py-1 text-center text-sm"
+                className="group flex min-w-[84px] flex-1 snap-start flex-col items-center gap-2.5 rounded-xl px-1 py-1 text-center text-[13px] sm:min-w-[104px] sm:text-sm"
               >
-                <span className={`flex h-[72px] w-[72px] items-center justify-center rounded-full transition-[background-color,transform] duration-300 group-hover:-translate-y-1 ${on ? "bg-forest" : "bg-[#f1eee7] group-hover:bg-mist"}`}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={on ? "#fff" : "#3E5A42"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <span className={`flex h-16 w-16 items-center justify-center rounded-full transition-[background-color,transform] duration-300 group-hover:-translate-y-1 sm:h-[72px] sm:w-[72px] ${on ? "bg-forest" : ""}`} style={on ? undefined : { background: tint }}>
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={on ? "#fff" : ink} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d={c.iconPath} />
                   </svg>
                 </span>
-                <span className={`leading-tight ${on ? "font-semibold text-sage-dark" : ""}`}>{c.name}</span>
+                <span className={`leading-tight ${on ? "font-semibold text-forest" : ""}`}>{c.name}</span>
               </button>
             );
           })}
         </div>
       </nav>
 
-      <section className="container-x scroll-mt-28 py-14 sm:py-16" aria-labelledby="shop-heading" ref={gridRef} id="bestsellers">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[.18em] text-sage">{concern ? "Shop by health concern" : "Loved by our customers"}</p>
-            <h2 id="shop-heading" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight" aria-live="polite">
-              {concern ? concern.name : "Bestsellers"}
+      <section className="relative mt-10 scroll-mt-28 bg-blush pb-14 pt-12 sm:mt-14 sm:pb-16 sm:pt-14" aria-labelledby="shop-heading" ref={gridRef} id="bestsellers">
+        <TornEdge fill="#FDEDEA" at="top" />
+        <TornEdge fill="#FDEDEA" at="bottom" />
+        <div className="container-x">
+          <div className="mb-7 text-center">
+            <h2 id="shop-heading" className="text-[clamp(28px,3.6vw,46px)] leading-tight" aria-live="polite">
+              {concern ? concern.name : "Best Sellers"}
             </h2>
             <p className="mt-1 text-muted">
-              {concern
-                ? `${matching.length} ${matching.length === 1 ? "product" : "products"}`
-                : "Classical and proprietary Ayurvedic medicines, made in Kochi."}
+              {concern ? `${matching.length} ${matching.length === 1 ? "product" : "products"}` : "Our most loved formulas"}
             </p>
+            {concern && matching.length > 0 && (
+              <Link href={`/concern/${concern.slug}`} className="mt-2 inline-block font-medium text-brick underline-offset-4 hover:underline">
+                See everything for {concern.name} →
+              </Link>
+            )}
           </div>
-          {concern && matching.length > 0 && (
-            <Link href={`/concern/${concern.slug}`} className="font-medium text-sage underline-offset-4 hover:underline">
-              See everything for {concern.name} →
-            </Link>
+
+          {list.length > 0 ? (
+            <div key={active} className="fade-in no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+              {list.map((p) => (
+                <div key={p.id} className="w-[46%] shrink-0 snap-start sm:w-auto">
+                  <ProductCard p={p} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-start gap-4 rounded-2xl bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-lg">{concern?.name} products are being added. Our experts can suggest what suits you meanwhile.</p>
+              <Link href="/consult" className="btn-primary shrink-0">Talk to an expert</Link>
+            </div>
           )}
-        </div>
 
-        {list.length > 0 ? (
-          <div key={active} className="fade-in grid grid-cols-2 gap-2.5 sm:gap-5 lg:grid-cols-4">
-            {list.map((p) => (
-              <ProductCard key={p.id} p={p} />
-            ))}
+          <div className="mt-6 text-center">
+            <Link href="/shop" className="font-medium text-brick underline-offset-4 hover:underline">View all products →</Link>
           </div>
-        ) : (
-          <div className="flex flex-col items-start gap-4 rounded-2xl bg-cream p-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-lg">{concern?.name} products are being added. Our doctor can suggest what suits you meanwhile.</p>
-            <Link href="/consult" className="btn-primary shrink-0">Talk to a doctor</Link>
-          </div>
-        )}
-
-        <div className="mt-10 text-center">
-          <Link href="/shop" className="btn-outline">View all products</Link>
         </div>
       </section>
     </>

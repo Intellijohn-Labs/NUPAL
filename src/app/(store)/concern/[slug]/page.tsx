@@ -83,7 +83,7 @@ export default async function ConcernPage({ params }: { params: P }) {
     <>
       {/* Header */}
       <section className="bg-cream">
-        <div className="container-x grid grid-cols-1 items-center gap-8 pb-12 pt-10 sm:pb-14 sm:pt-14 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="container-x grid items-center gap-8 pb-12 pt-10 sm:pb-14 sm:pt-14 lg:grid-cols-[1.2fr_.8fr]">
           <div>
             <nav aria-label="Breadcrumb" className="mb-5 text-sm text-muted">
               <Link href="/" className="hover:text-ink">Home</Link> / <span className="text-ink">{concern.name}</span>
@@ -185,7 +185,7 @@ export default async function ConcernPage({ params }: { params: P }) {
             title={`What customers say about our ${lower} products`}
             action={<Link href="/reviews" className="font-medium text-sage hover:underline">Read all reviews →</Link>}
           />
-          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {reviews.map((r, i) => (
               <li key={r.id}>
                 <Reveal index={i % 3} className="h-full">
@@ -200,11 +200,11 @@ export default async function ConcernPage({ params }: { params: P }) {
       {/* Ask an expert */}
       <section id="expert" aria-labelledby="expert-h" className="relative scroll-mt-48 overflow-hidden bg-forest text-cream">
         <svg viewBox="0 0 560 300" className="pointer-events-none absolute -right-10 bottom-0 w-[560px] opacity-[.18]" aria-hidden="true">
-          <g fill="none" stroke="#C9D4C8" strokeWidth="2">
+          <g fill="none" stroke="#c9d4c8" strokeWidth="2">
             <path d="M40 160L280 30l240 130M10 200l90-48h360l90 48M100 200v100M180 200v100M380 200v100M460 200v100M60 300h440M230 300v-70h100v70" />
           </g>
         </svg>
-        <div className="container-x relative grid grid-cols-1 items-center gap-10 py-16 sm:py-20 lg:grid-cols-[1.2fr_.8fr]">
+        <div className="container-x relative grid items-center gap-10 py-16 sm:py-20 lg:grid-cols-[1.2fr_.8fr]">
           <Reveal>
             <p className="text-xs font-medium uppercase tracking-[.18em] text-gold">Personal guidance</p>
             <h2 id="expert-h" className="mt-2 text-[clamp(30px,3.6vw,46px)] leading-tight">Ask an Ayurvedic expert about {lower}</h2>

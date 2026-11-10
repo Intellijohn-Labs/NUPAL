@@ -20,7 +20,7 @@ export default async function ConcernsPage() {
 
   return (
     <>
-      <PageHeader title="Health concerns" subtitle="Shown in “Shop by concern”, the icon row on the homepage and the menu." />
+      <PageHeader title="Health concerns" subtitle="The first six (by order) show as cards on the homepage with their short line; all of them are in the “Shop by Concern” menu." />
       <section className="a-card mb-5">
         <h2 className="mb-3 font-sans text-lg font-semibold">Add a concern</h2>
         <form action={saveConcern.bind(null, null)} className="grid gap-3 sm:grid-cols-[1fr_200px_110px_auto] sm:items-end">
@@ -37,7 +37,7 @@ export default async function ConcernsPage() {
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3E5A42" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d={iconPath(c.icon)} /></svg>
             </span>
             <form action={saveConcern.bind(null, c.id)} className="grid flex-1 gap-3 sm:grid-cols-[1fr_190px_90px_auto_auto] sm:items-end">
-              <div><label htmlFor={`n-${c.id}`} className="a-label">Name</label><input id={`n-${c.id}`} name="name" defaultValue={c.name} className="a-input" /></div>
+              <div><label htmlFor={`n-${c.id}`} className="a-label">Name</label><input id={`n-${c.id}`} name="name" defaultValue={c.name} className="a-input" /><input aria-label="Short line on the homepage card" name="tagline" defaultValue={c.tagline} placeholder="Short line, e.g. Everyday liver support" className="a-input mt-2" /></div>
               <div><label htmlFor={`i-${c.id}`} className="a-label">Icon</label><IconSelect id={`i-${c.id}`} value={c.icon} /></div>
               <div><label htmlFor={`o-${c.id}`} className="a-label">Order</label><input id={`o-${c.id}`} name="sortOrder" inputMode="numeric" defaultValue={c.sortOrder} className="a-input" /></div>
               <label className="flex h-11 items-center gap-2 text-sm"><input type="checkbox" name="active" defaultChecked={c.active} className="h-5 w-5 accent-[#2e6b47]" />Visible</label>

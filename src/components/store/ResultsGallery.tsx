@@ -74,11 +74,11 @@ export function ResultsGallery({ items, step, className = "", layout = "grid" }:
   const grid =
     layout === "home"
       ? "no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0"
-      : "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3";
+      : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3";
   const cell = layout === "home" ? "w-[84vw] max-w-[360px] shrink-0 snap-center sm:w-auto sm:max-w-none" : "";
 
   return (
-    <div className={className}>
+    <div className={`min-w-0 ${className}`}>
       <ul className={grid}>
         {list.map((r, i) => (
           <li key={r.id} className={cell}>

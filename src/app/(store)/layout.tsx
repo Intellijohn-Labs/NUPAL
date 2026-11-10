@@ -6,6 +6,7 @@ import { Header } from "@/components/store/Header";
 import { OfferBar } from "@/components/store/OfferBar";
 import { Footer } from "@/components/store/Footer";
 import { WhatsAppFloat } from "@/components/store/WhatsAppFloat";
+import { MobileBar } from "@/components/store/MobileBar";
 
 export const dynamic = "force-dynamic";
 
@@ -26,9 +27,10 @@ export default async function StoreLayout({ children }: { children: React.ReactN
       </a>
       <OfferBar messages={settings.offerMessages} />
       <Header concerns={concerns} types={types} />
-      <main id="main">{children}</main>
+      <main id="main" className="pb-16">{children}</main>
       <Footer concerns={concerns} pages={pages} settings={settings} socials={socials} />
       <WhatsAppFloat number={settings.whatsappNumber} />
+      <MobileBar whatsapp={settings.whatsappNumber} />
     </CartProvider>
   );
 }

@@ -63,7 +63,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: SP }
           <Link href="/shop" className="btn-primary mt-5">Browse products</Link>
         </div>
       ) : (
-        <div className="mt-8 grid grid-cols-1 items-start gap-10 lg:grid-cols-[320px_1fr]">
+        <div className="mt-8 grid items-start gap-10 lg:grid-cols-[320px_1fr]">
           <aside className="flex flex-col gap-5 lg:sticky lg:top-28">
             <RatingSummary avg={agg._avg.rating ?? 0} count={agg._count} byStar={byStar} hrefFor={(s) => qs({ stars: s ? String(s) : null, show: null })} active={stars} />
             {productsWithReviews.length > 1 && <ProductFilterSelect products={productsWithReviews} value={product?.slug ?? ""} baseQuery={baseQuery} />}
@@ -91,7 +91,7 @@ export default async function ReviewsPage({ searchParams }: { searchParams: SP }
                 </>
               )}
             </p>
-            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <ul className="grid gap-4 md:grid-cols-2">
               {reviews.map((r) => (
                 <li key={r.id}><ReviewCard r={r} /></li>
               ))}

@@ -7,7 +7,7 @@ import { db } from "@/lib/db";
 import { slugify } from "@/lib/format";
 import { bool, optStr, str } from "@/lib/form";
 
-const RESERVED = new Set(["shop", "cart", "checkout", "consult", "product", "concern", "order", "admin", "api", "uploads", "brand", "reviews", "stories", "results"]);
+const RESERVED = new Set(["shop", "cart", "checkout", "consult", "product", "concern", "order", "admin", "api", "uploads", "brand", "reviews", "stories", "results", "account"]);
 
 export async function savePage(id: string | null, _prev: string | null, f: FormData): Promise<string | null> {
   await requireArea("pages");
@@ -17,7 +17,7 @@ export async function savePage(id: string | null, _prev: string | null, f: FormD
   if (RESERVED.has(slug)) return `“${slug}” is used by the website. Choose another URL slug.`;
   const clash = await db.page.findFirst({ where: { slug, NOT: id ? { id } : undefined } });
   if (clash) return `Another page already uses “/${slug}”.`;
-  const data = { title, slug, content: str(f, "content"), seoDesc: optStr(f, "seoDesc"), published: bool(f, "published"), inFooter: bool(f, "inFooter") };
+  const data = { title, slug, content: str(f, "content"), seoDesc: optStr(f, "seoDesc"), published: bool(f, "published"), inFooter: bool(f, "inFooter"), headerImage: f.getAll("headerImage_keep").map(String)[0] ?? null };
   const page = id ? await db.page.update({ where: { id }, data }) : await db.page.create({ data });
   revalidatePath("/", "layout");
   redirect(`/admin/pages/${page.id}?saved=1`);

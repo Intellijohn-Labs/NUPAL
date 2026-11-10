@@ -10,7 +10,7 @@ export async function saveConcern(id: string | null, f: FormData) {
   await requireArea("concerns");
   const name = str(f, "name");
   if (!name) return;
-  const data = { name, icon: str(f, "icon") || "leaf", sortOrder: int(f, "sortOrder"), active: bool(f, "active") };
+  const data = { name, icon: str(f, "icon") || "leaf", tagline: str(f, "tagline"), sortOrder: int(f, "sortOrder"), active: bool(f, "active") };
   if (id) {
     // The web address is set once and kept, so links already shared keep working after a rename.
     await db.concern.update({ where: { id }, data });

@@ -47,6 +47,60 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <F id="resultsCount" label="Number shown in the counter" inputMode="numeric" defaultValue={s.resultsCount} help="Shown as “10,000+ hair regrowth results”." />
             <F id="resultsHook" label="Headline" defaultValue={s.resultsHook} />
           </section>
+          {(() => {
+            const h = (s.heritage && typeof s.heritage === "object" && !Array.isArray(s.heritage) ? s.heritage : {}) as {
+              show?: boolean; eyebrow?: string; title?: string; quote?: string; body?: string; year?: number | null;
+              stats?: { value: number | string; suffix: string; label: string }[]; certs?: string[]; ctaLabel?: string; ctaHref?: string;
+            };
+            return (
+              <section className="a-card flex flex-col gap-3">
+                <h2 className="font-sans text-lg font-semibold">“Why Nupal” section (homepage)</h2>
+                <p className="text-sm text-[#56685d]">The short story beside NUPAL’s DNA illustration, with three facts and the certificate badges. The four cards below it use the “Why NUPAL” points.</p>
+                <label className="flex items-center gap-2 text-[15px]"><input type="checkbox" name="her_show" defaultChecked={h.show !== false} className="h-5 w-5 accent-[#2e6b47]" />Show on the homepage</label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <F id="her_eyebrow" label="Small line above the title" defaultValue={h.eyebrow ?? ""} />
+                  <F id="her_year" label="“Since” year on the seal" inputMode="numeric" defaultValue={h.year ?? ""} />
+                </div>
+                <div><label htmlFor="her_title" className="a-label">Title</label><textarea id="her_title" name="her_title" rows={2} defaultValue={h.title ?? ""} className="a-textarea" /><p className="a-help">Press Enter to choose where the second line starts.</p></div>
+                <div><label htmlFor="her_quote" className="a-label">Quote</label><input id="her_quote" name="her_quote" defaultValue={h.quote ?? ""} className="a-input" /></div>
+                <div><label htmlFor="her_body" className="a-label">Text</label><textarea id="her_body" name="her_body" rows={3} defaultValue={h.body ?? ""} className="a-textarea" /></div>
+                <p className="a-label mb-0">Three short facts (a plain number counts up on screen)</p>
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="grid grid-cols-[90px_70px_1fr] gap-2">
+                    <input aria-label={`Fact ${i + 1}`} name={`her_sv_${i}`} defaultValue={h.stats?.[i]?.value ?? ""} placeholder="1960" className="a-input" />
+                    <input aria-label={`After number ${i + 1}`} name={`her_ss_${i}`} defaultValue={h.stats?.[i]?.suffix ?? ""} placeholder="+" className="a-input" />
+                    <input aria-label={`Label ${i + 1}`} name={`her_sl_${i}`} defaultValue={h.stats?.[i]?.label ?? ""} placeholder="Years of practice" className="a-input" />
+                  </div>
+                ))}
+                <F id="her_certs" label="Certificates (comma separated)" defaultValue={(h.certs ?? []).join(", ")} help="Shown as badges, e.g. GMP, WHO-GMP, ISO 9001, AYUSH. Only list certificates NUPAL holds." />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <F id="her_cta" label="Button text" defaultValue={h.ctaLabel ?? ""} />
+                  <F id="her_href" label="Button link" defaultValue={h.ctaHref ?? ""} />
+                </div>
+              </section>
+            );
+          })()}
+          <section className="a-card flex flex-col gap-3">
+            <h2 className="font-sans text-lg font-semibold">Homepage banner chips and collections</h2>
+            <p className="a-label mb-0">Trust chips in the banner (up to 3)</p>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {[0, 1, 2].map((i) => (
+                <input key={i} aria-label={`Chip ${i + 1}`} name={`chip_${i}`} defaultValue={s.heroChips[i] ?? ""} placeholder="Cash on Delivery" className="a-input" />
+              ))}
+            </div>
+            <p className="a-label mb-0 mt-2">Two collection cards</p>
+            {[0, 1].map((i) => {
+              const c = ((Array.isArray(s.homeCollections) ? s.homeCollections : []) as { title?: string; text?: string; href?: string }[])[i] ?? {};
+              return (
+                <div key={i} className="grid gap-2 rounded-xl border border-[#e8eeea] p-3 sm:grid-cols-[1fr_1.4fr_160px]">
+                  <input aria-label={`Collection ${i + 1} title`} name={`col_t_${i}`} defaultValue={c.title ?? ""} placeholder="Everyday Wellness" className="a-input" />
+                  <input aria-label={`Collection ${i + 1} text`} name={`col_x_${i}`} defaultValue={c.text ?? ""} placeholder="One short line" className="a-input" />
+                  <input aria-label={`Collection ${i + 1} link`} name={`col_h_${i}`} defaultValue={c.href ?? ""} placeholder="/shop?type=Capsule" className="a-input" />
+                </div>
+              );
+            })}
+            <div className="mt-2"><label htmlFor="footerLegal" className="a-label">Footer legal line</label><textarea id="footerLegal" name="footerLegal" rows={2} defaultValue={s.footerLegal} placeholder="Drug licence no. …  This information is not a substitute for medical advice." className="a-textarea" /></div>
+          </section>
           <section className="a-card flex flex-col gap-3">
             <h2 className="font-sans text-lg font-semibold">“Why NUPAL” points</h2>
             <p className="text-sm text-[#56685d]">The short strip near the bottom of the homepage. Up to 4 points; leave all empty to hide it.</p>

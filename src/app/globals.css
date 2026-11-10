@@ -1,20 +1,38 @@
 @import "tailwindcss";
 
-/* NUPAL design tokens — logo green and pestle brown, with the deep Kerala green and cream from the design. */
+/* NUPAL design tokens.
+   Header, hero banner and footer: NUPAL’s deep forest green with gold.
+   Between them: a warm ivory page with soft pastel bands and brick-red buttons (inspired by vedix.com). */
 @theme {
   --color-forest: #1f3d2b;
   --color-forest-deep: #16301f;
   --color-sage: #567459;
   --color-sage-dark: #3e5a42;
-  --color-leaf: #72bf44; /* logo green — decorative only, not for text on white */
-  --color-pestle: #913810; /* logo brown — prices, sale accents */
+  --color-leaf: #72bf44;
   --color-gold: #c9a45c;
+  --color-pestle: #913810;
   --color-cream: #f7f4ee;
-  --color-sand: #ece6da;
+  --color-sand: #ece4d4;
+  --color-mist: #e6ede2;
   --color-line: #e3dccd;
   --color-ink: #22302a;
   --color-muted: #5e6862;
-  --color-mist: #eef2ea;
+  /* middle-of-page palette */
+  --color-ivory: #fcf8ec; /* page background */
+  --color-maroon: #370909;
+  --color-brick: #a0443c; /* main buttons between banner and footer */
+  --color-brick-dark: #863530;
+  --color-blush: #fdedea;
+  --color-mintband: #d9f0d4;
+  --color-lav: #e4dafd;
+  --color-peach: #fef1e9;
+  --color-coral: #b4501b; /* years and numbers on light backgrounds */
+  --color-rate: #3f9a3a; /* rating pills */
+  /* kept for older sections */
+  --color-sun: #f7cb20;
+  --color-sunny: #fff4c7;
+  --color-turq: #44caaa;
+  --color-mint: #eaf8f2;
 
   --font-display: var(--font-marcellus), Georgia, serif;
   --font-sans: var(--font-jost), system-ui, sans-serif;
@@ -22,15 +40,10 @@
 
 @layer base {
   html { -webkit-text-size-adjust: 100%; }
-  body { @apply bg-white text-ink font-sans antialiased; }
+  body { @apply bg-ivory text-ink font-sans antialiased; }
   h1, h2, h3 { @apply font-display font-normal; text-wrap: balance; }
   :focus-visible { outline: 2px solid var(--color-sage); outline-offset: 2px; }
   input, select, textarea { font: inherit; }
-  /* Phones and tablets: never let the page scroll sideways. `clip` (with `hidden` as a fallback)
-     keeps the sticky header working. Desktop is left untouched. */
-  @media (max-width: 1023.98px) {
-    body { overflow-x: hidden; overflow-x: clip; }
-  }
 }
 
 @utility container-x {
@@ -40,13 +53,13 @@
   @apply inline-flex items-center justify-center gap-2 rounded-full px-6 h-12 text-[15px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }
 @utility btn-primary {
-  @apply btn bg-sage text-white hover:bg-forest;
+  @apply btn bg-brick text-white hover:bg-brick-dark;
 }
 @utility btn-gold {
-  @apply btn bg-gold text-[#1b1608] hover:bg-[#b8924a];
+  @apply btn bg-[#c9a45c] text-[#1b1608] hover:bg-[#b8924a];
 }
 @utility btn-outline {
-  @apply btn border border-line bg-white text-ink hover:border-sage;
+  @apply btn border border-line bg-white text-ink hover:border-forest;
 }
 @utility field {
   @apply h-12 w-full rounded-xl border border-[#cfc5b0] bg-white px-4 text-base outline-none focus:border-sage;
@@ -90,9 +103,9 @@
 
 .prose-nupal h2 { @apply mt-8 mb-3 text-2xl; }
 .prose-nupal h3 { @apply mt-6 mb-2 text-xl; }
-.prose-nupal p { @apply my-3 leading-7 text-[#3f4a44]; }
-.prose-nupal ul { @apply my-3 list-disc pl-6 leading-7 text-[#3f4a44]; }
-.prose-nupal ol { @apply my-3 list-decimal pl-6 leading-7 text-[#3f4a44]; }
+.prose-nupal p { @apply my-3 leading-7 text-[#35514a]; }
+.prose-nupal ul { @apply my-3 list-disc pl-6 leading-7 text-[#35514a]; }
+.prose-nupal ol { @apply my-3 list-decimal pl-6 leading-7 text-[#35514a]; }
 .prose-nupal a { @apply text-sage underline; }
 
 @keyframes marquee { to { transform: translateX(-50%); } }
@@ -106,6 +119,17 @@
 .hero-sway { transform-origin: 50% 100%; animation: herosway 8s ease-in-out infinite; }
 @keyframes dnafloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-18px) rotate(1.5deg)}}
 .dna-float{animation:dnafloat 14s ease-in-out infinite;will-change:transform;}
+@keyframes dnaspin { 0%, 100% { rotate: -6deg; scale: 1; } 50% { rotate: 6deg; scale: 1.04; } }
+.dna-spin { animation: dnaspin 26s ease-in-out infinite; }
+@keyframes kssway { 0%, 100% { rotate: -1.6deg; } 50% { rotate: 1.6deg; } }
+.ks-sway { animation: kssway 7s ease-in-out infinite; }
+.ks-sway2 { animation: kssway 9s ease-in-out infinite reverse; }
+@keyframes kssun { 0%, 100% { scale: 1; } 50% { scale: 1.05; } }
+.ks-sun { animation: kssun 6s ease-in-out infinite; transform-origin: 1230px 70px; }
+@keyframes ksfly { 0%, 100% { translate: 0 0; } 50% { translate: -40px -12px; } }
+.ks-birds { animation: ksfly 14s ease-in-out infinite; }
+@keyframes scrolldot { 0%, 100% { translate: -50% 0; opacity: .6; } 50% { translate: -50% 6px; opacity: 1; } }
+.scroll-dot { animation: scrolldot 1.8s ease-in-out infinite; }
 @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .fade-in { animation: fadein .5s ease both; }
 .no-scrollbar { scrollbar-width: none; }
@@ -122,3 +146,13 @@
   content: ""; position: absolute; left: 0; top: .32em; width: 20px; height: 20px; border-radius: 9999px;
   background: #e6ede2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23567459' stroke-width='3'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 12px no-repeat;
 }
+
+/* About page: first paragraph of a story opening and of a message reads as a larger lead */
+.intro-lead > p:first-child { @apply font-display text-[clamp(20px,2.1vw,26px)] leading-snug text-forest; }
+.message-quote > p:first-child { @apply font-display text-[clamp(20px,2.1vw,25px)] leading-snug text-forest; }
+@keyframes scrollbob { 0%, 100% { transform: translateY(0); opacity: .6; } 50% { transform: translateY(4px); opacity: 1; } }
+.scroll-bob { animation: scrollbob 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .scroll-bob { animation: none; } }
+
+/* Safety net: nothing may widen the page sideways on phones (swipe rows scroll inside themselves). */
+html, body { overflow-x: clip; }

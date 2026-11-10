@@ -37,6 +37,7 @@ model Concern {
   name      String
   slug      String              @unique
   icon      String              @default("leaf") // key of a built-in icon
+  tagline   String              @default("") // short line on the homepage card, e.g. “Everyday liver support”
   intro     String              @default("") // short text at the top of the concern page (markdown)
   faqs      Json                @default("[]") // [{ q, a }] shown on the concern page
   sortOrder Int                 @default(0)
@@ -258,6 +259,7 @@ model Page {
   content   String   @default("") // markdown
   inFooter  Boolean  @default(true)
   inAboutMenu Boolean @default(false) // listed in the header’s “About us ▾” menu
+  headerImage String? // optional background photo for the page header; without it an illustrated Kerala scene is shown
   published Boolean  @default(true)
   seoDesc   String?
   blocks    PageBlock[]
@@ -305,6 +307,10 @@ model Setting {
   youtubeUrl        String   @default("")
   resultsCount      Int      @default(10000) // number in the “Real results” counter
   resultsHook       String   @default("Click to see. Scroll to believe.")
+  heritage          Json     @default("{}") // homepage “Why Nupal” section with the DNA: story, facts, certificates
+  heroChips         String[] @default(["Cash on Delivery", "Made in Kerala", "Doctor guidance"]) // small trust chips in the homepage banner
+  homeCollections   Json     @default("[]") // two homepage collection cards: [{ title, text, href }]
+  footerLegal       String   @default("") // licence numbers and medical disclaimer under the footer
   whyPoints         Json     @default("[]") // “Why NUPAL” strip on the homepage: [{ title, text }]
   updatedAt         DateTime @updatedAt
 }

@@ -6,8 +6,9 @@ export type ImageOptions = {
   /** Longest side in pixels after resizing. */
   maxSide?: number;
   /**
-   * Product photos: trim plain white/empty borders, then centre the product on a square
-   * with even padding — so every product looks the same size in the shop.
+   * Product photos, made square with no white frame:
+   * - a full photo (scene, lifestyle shot) is cropped to a centred square;
+   * - a pack shot on white has its white border trimmed and only a hairline margin added.
    */
   square?: boolean;
 };
@@ -54,17 +55,27 @@ export async function compressImage(file: File, opts: ImageOptions | number = {}
 
     if (square) {
       const box = contentBox(ctx, w, h);
-      const side = Math.round(Math.max(box.w, box.h) * 1.16); // 8% breathing room on each side
-      const out = Math.min(side, maxSide);
-      const k = out / side;
+      const fullPhoto = box.w > w * 0.9 && box.h > h * 0.9;
       const sq = document.createElement("canvas");
-      sq.width = out;
-      sq.height = out;
       const sctx = sq.getContext("2d")!;
-      sctx.fillStyle = "#ffffff";
-      sctx.fillRect(0, 0, out, out);
       sctx.imageSmoothingQuality = "high";
-      sctx.drawImage(canvas, box.x, box.y, box.w, box.h, (out - box.w * k) / 2, (out - box.h * k) / 2, box.w * k, box.h * k);
+      if (fullPhoto) {
+        // Centre square crop of the whole photo.
+        const side = Math.min(w, h);
+        const out = Math.min(side, maxSide);
+        sq.width = out;
+        sq.height = out;
+        sctx.drawImage(canvas, (w - side) / 2, (h - side) / 2, side, side, 0, 0, out, out);
+      } else {
+        const side = Math.round(Math.max(box.w, box.h) * 1.04); // hairline margin only
+        const out = Math.min(side, maxSide);
+        const k = out / side;
+        sq.width = out;
+        sq.height = out;
+        sctx.fillStyle = "#ffffff";
+        sctx.fillRect(0, 0, out, out);
+        sctx.drawImage(canvas, box.x, box.y, box.w, box.h, (out - box.w * k) / 2, (out - box.h * k) / 2, box.w * k, box.h * k);
+      }
       canvas = sq;
     }
 
@@ -91,6 +102,8 @@ export async function uploadFiles(files: File[], folder: string, onUpdate?: (i: 
 
   const blobs: Blob[] = [];
   for (let i = 0; i < files.length; i++) blobs.push(await compressImage(files[i], opts));
+  // Product photos made square here are marked, so “Tidy product photos” leaves them alone.
+  const mark = typeof opts === "object" && opts.square ? "?v=tidy" : "";
   const targets = await getUploadTargets(folder, blobs.map((b) => b.type || "image/jpeg"));
   if (targets.mode === "error") {
     files.forEach((_, i) => set(i, { status: "failed", error: targets.error }));
@@ -110,7 +123,7 @@ export async function uploadFiles(files: File[], folder: string, onUpdate?: (i: 
           body.append("", blobs[i], files[i].name);
           const res = await fetch(t.uploadUrl, { method: "PUT", body, headers: { "x-upsert": "false" } });
           if (!res.ok) throw new Error(`Upload failed (${res.status})`);
-          set(i, { status: "done", url: t.publicUrl });
+          set(i, { status: "done", url: t.publicUrl + mark });
         } else {
           const fd = new FormData();
           fd.append("folder", folder);
@@ -118,7 +131,7 @@ export async function uploadFiles(files: File[], folder: string, onUpdate?: (i: 
           fd.append("file", new File([blobs[i]], files[i].name.replace(/\.[^.]+$/, "") + "." + ext, { type: blobs[i].type || "image/jpeg" }));
           const r = await uploadViaServer(fd);
           if (!r.url) throw new Error(r.error || "Upload failed");
-          set(i, { status: "done", url: r.url });
+          set(i, { status: "done", url: r.url + mark });
         }
       } catch (e) {
         set(i, { status: "failed", error: e instanceof Error ? e.message : "Upload failed" });

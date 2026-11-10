@@ -7,7 +7,7 @@ import { slugify } from "@/lib/format";
 import { str } from "@/lib/form";
 import { BLOCK_TYPES } from "@/lib/blocks";
 
-const DEFAULT_TITLE: Record<string, string> = { intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
+const DEFAULT_TITLE: Record<string, string> = { founder: "Our story is written in our DNA", duo: "Vision & mission", intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
 
 async function refresh(pageId: string) {
   const page = await db.page.findUnique({ where: { id: pageId }, select: { slug: true } });
@@ -48,6 +48,10 @@ export async function saveBlock(id: string, f: FormData) {
   };
   if (b.type === "intro") {
     data = { eyebrow: str(f, "eyebrow"), image: keep(f, "image")[0] ?? null, body: str(f, "body"), name: str(f, "name"), role: str(f, "role") };
+  } else if (b.type === "founder") {
+    data = { eyebrow: str(f, "eyebrow"), image: keep(f, "image")[0] ?? null, quote: str(f, "quote"), body: str(f, "body"), badge: str(f, "badge"), badgeSub: str(f, "badgeSub") };
+  } else if (b.type === "duo") {
+    data = { eyebrow: str(f, "eyebrow"), cards: rows("title", "text").filter((r) => r.title).slice(0, 2) };
   } else if (b.type === "stats") {
     data = {
       stats: rows("value", "suffix", "label")
@@ -67,9 +71,10 @@ export async function saveBlock(id: string, f: FormData) {
     const names = f.getAll("row_name").map(String);
     const roles = f.getAll("row_role").map(String);
     const bios = f.getAll("row_bio").map(String);
+    const quals = f.getAll("row_qual").map(String);
     data = {
       people: keys
-        .map((k, i) => ({ name: names[i]?.trim() ?? "", role: roles[i]?.trim() ?? "", bio: bios[i]?.trim() ?? "", photo: keep(f, `row_${k}_img`)[0] ?? null }))
+        .map((k, i) => ({ name: names[i]?.trim() ?? "", role: roles[i]?.trim() ?? "", qual: quals[i]?.trim() ?? "", bio: bios[i]?.trim() ?? "", photo: keep(f, `row_${k}_img`)[0] ?? null }))
         .filter((p) => p.name),
     };
   } else if (b.type === "logos") {

@@ -21,7 +21,7 @@ export function ReviewCard({ r, clamp = false }: { r: ReviewData; clamp?: boolea
         <Stars value={r.rating} />
         {r.title && <h3 className="font-sans text-base font-semibold">{r.title}</h3>}
       </div>
-      <p className={`mt-2 whitespace-pre-line leading-7 text-[#3f4a44] ${clamp ? "line-clamp-5" : ""}`}>{r.body}</p>
+      <p className={`mt-2 whitespace-pre-line leading-7 text-[#35514a] ${clamp ? "line-clamp-5" : ""}`}>{r.body}</p>
       <p className="mt-3 text-sm text-muted">
         <span className="font-medium text-ink">{r.name}</span>
         {r.place ? `, ${r.place}` : ""} · {r.createdAt.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}

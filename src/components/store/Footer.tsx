@@ -3,18 +3,19 @@ import { Logo } from "./Logo";
 import { PLATFORMS, SocialIcon } from "./SocialIcon";
 
 type Props = {
-  concerns: { name: string; slug: string }[];
+  concerns?: { name: string; slug: string }[];
   pages: { title: string; slug: string }[];
-  settings: { legalName: string; address: string; phone: string; email: string; customerCareHours: string };
+  settings: { legalName: string; address: string; phone: string; email: string; customerCareHours: string; footerLegal?: string };
   socials: { id: string; platform: string; label: string; url: string }[];
 };
 
-export function Footer({ concerns, pages, settings, socials }: Props) {
+export function Footer({ pages, settings, socials }: Props) {
   return (
-    <footer className="bg-forest text-cream">
-      <div className="container-x grid grid-cols-1 gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="flex flex-col gap-4">
+    <footer className="relative mt-12 bg-[#0F3A28] pb-24 text-cream lg:pb-0">
+      <div className="container-x grid grid-cols-2 gap-x-6 gap-y-10 py-14 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+        <div className="col-span-2 flex flex-col items-start gap-4 lg:col-span-1">
           <Logo light className="h-12 w-auto" />
+          <p className="text-[15px] text-[#c9d4c8]">Rooted in Ayurveda. Committed to your wellbeing.</p>
           <p className="text-[15px] leading-7 text-[#c9d4c8]">
             {settings.legalName && (
               <>
@@ -52,42 +53,37 @@ export function Footer({ concerns, pages, settings, socials }: Props) {
           )}
         </div>
         <div>
-          <h2 className="mb-4 text-xl">Shop by concern</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[.14em] text-gold">Shop</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
-            {concerns.slice(0, 7).map((c) => (
-              <li key={c.slug}>
-                <Link href={`/concern/${c.slug}`} className="hover:text-white">{c.name}</Link>
-              </li>
-            ))}
+            <li><Link href="/shop" className="hover:text-white">All Products</Link></li>
+            <li><Link href="/concerns" className="hover:text-white">Shop by Concern</Link></li>
+            <li><Link href="/#bestsellers" className="hover:text-white">Bestsellers</Link></li>
+            <li><Link href="/results" className="hover:text-white">Real Results</Link></li>
           </ul>
         </div>
         <div>
-          <h2 className="mb-4 text-xl">Help</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[.14em] text-gold">Explore</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
-            <li><Link href="/consult" className="hover:text-white">Consult an expert</Link></li>
-            <li><Link href="/results" className="hover:text-white">Real results</Link></li>
-            <li><Link href="/reviews" className="hover:text-white">Customer reviews</Link></li>
-            <li><Link href="/stories" className="hover:text-white">Customer stories</Link></li>
-            <li><Link href="/cart" className="hover:text-white">Your cart</Link></li>
-            {pages.filter((p) => !p.slug.includes("policy") && !p.slug.includes("terms")).map((p) => (
-              <li key={p.slug}><Link href={`/${p.slug}`} className="hover:text-white">{p.title}</Link></li>
-            ))}
+            <li><Link href="/about-us" className="hover:text-white">About Nupal</Link></li>
+            <li><Link href="/stories" className="hover:text-white">Customer Experiences</Link></li>
+            <li><Link href="/reviews" className="hover:text-white">Customer Reviews</Link></li>
+            <li><Link href="/consult" className="hover:text-white">Consultation</Link></li>
           </ul>
         </div>
         <div>
-          <h2 className="mb-4 text-xl">Policies</h2>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-[.14em] text-gold">Support &amp; information</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
-            {pages.filter((p) => p.slug.includes("policy") || p.slug.includes("terms")).map((p) => (
+            {pages.map((p) => (
               <li key={p.slug}><Link href={`/${p.slug}`} className="hover:text-white">{p.title}</Link></li>
             ))}
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/15">
-        <div className="container-x flex flex-wrap justify-between gap-3 py-5 text-[13px] text-[#c9d4c8]">
-          <span>© {new Date().getFullYear()} NUPAL Remedies. All rights reserved.</span>
-          <span>Cash on delivery available · Online payment coming soon</span>
-        </div>
+      <div className="container-x">
+        <p className="border-t border-white/15 pb-6 pt-5 text-xs leading-relaxed text-[#9fb0a4]">
+          © {new Date().getFullYear()} NUPAL Remedies. All rights reserved.
+          {settings.footerLegal ? ` ${settings.footerLegal}` : ""}
+        </p>
       </div>
     </footer>
   );

@@ -4,13 +4,13 @@ import { requireArea } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { inr } from "@/lib/format";
 import { Flash, PageHeader, Pill } from "@/components/admin/PageHeader";
-import { toggleProduct } from "./actions";
+import { tidyProductPhotos, toggleProduct } from "./actions";
 
-type SP = Promise<{ q?: string; status?: string; deleted?: string }>;
+type SP = Promise<{ q?: string; status?: string; deleted?: string; tidied?: string; left?: string; skipped?: string }>;
 
 export default async function ProductsPage({ searchParams }: { searchParams: SP }) {
   await requireArea("products");
-  const { q, status, deleted } = await searchParams;
+  const { q, status, deleted, tidied, left, skipped } = await searchParams;
   const where: Prisma.ProductWhereInput = {
     ...(q ? { name: { contains: q, mode: "insensitive" } } : {}),
     ...(status === "hidden" ? { isActive: false } : status === "out" ? { variants: { some: { stock: { lte: 0 } } } } : status === "visible" ? { isActive: true } : {}),
@@ -33,9 +33,17 @@ export default async function ProductsPage({ searchParams }: { searchParams: SP 
   return (
     <>
       <PageHeader title="Products" subtitle={`${total} products in the catalogue`}>
+        <form action={tidyProductPhotos}>
+          <button type="submit" className="a-btn-ghost" title="Makes uploaded product photos square, with no white frame">Tidy product photos</button>
+        </form>
         <Link href="/admin/products/new" className="a-btn">+ Add product</Link>
       </PageHeader>
       <Flash show={!!deleted}>Product removed.</Flash>
+      <Flash show={tidied !== undefined}>
+        {Number(tidied) > 0 ? `${tidied} photo${tidied === "1" ? "" : "s"} tidied.` : "All product photos are already tidy."}
+        {Number(left) > 0 && ` ${left} more to go — click “Tidy product photos” again.`}
+        {Number(skipped) > 0 && ` ${skipped} could not be read and were left as they were.`}
+      </Flash>
       <div className="a-card">
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <div className="flex flex-wrap gap-1 rounded-xl bg-[#f3f6f4] p-1">

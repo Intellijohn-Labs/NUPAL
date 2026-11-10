@@ -71,6 +71,7 @@ export function ProductForm({ product, concerns, types }: { product?: Product; c
             <div>
               <label htmlFor="ingredients" className="a-label">Ingredients</label>
               <textarea id="ingredients" name="ingredients" rows={4} defaultValue={product?.ingredients} className="a-textarea" />
+              <p className="a-help">One ingredient per line (or separated by commas). Each one shows as a bullet point on the product page.</p>
             </div>
             <div>
               <label htmlFor="dosage" className="a-label">Dosage and how to use</label>
@@ -129,7 +130,7 @@ export function ProductForm({ product, concerns, types }: { product?: Product; c
 
         <section className="a-card flex flex-col gap-3">
           <h2 className="font-sans text-lg font-semibold">Photos</h2>
-          <ImageField name="images" folder="products" square maxSide={1200} existing={product?.images} help="Any shape works — white borders are trimmed and the product is centred on a square automatically. First photo is the cover." />
+          <ImageField name="images" folder="products" square maxSide={1200} existing={product?.images} help="Any shape works. Photos are made square automatically: white borders are trimmed, and full photos are cropped to the centre. Keep the product in the middle of the photo. First photo is the cover." />
           <div>
             <label htmlFor="videoUrl" className="a-label">Video link (optional)</label>
             <input id="videoUrl" name="videoUrl" type="url" defaultValue={product?.videoUrl} placeholder="https://www.youtube.com/watch?v=…" className="a-input" />

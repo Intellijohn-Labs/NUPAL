@@ -164,3 +164,14 @@ export async function deleteResult(id: string) {
   await Promise.all([r.beforeUrl, r.afterUrl, r.imageUrl].filter(Boolean).map((u) => deleteStoredFile(u!)));
   done();
 }
+
+/** Tags every result that has no health concern yet with one concern (e.g. all existing photos → Hair Care). */
+export async function tagUntaggedResults(f: FormData) {
+  await requireArea("results");
+  const concernId = String(f.get("concernId") ?? "");
+  const tab = String(f.get("tab") ?? "PUBLISHED");
+  if (!concernId || !(await db.concern.findUnique({ where: { id: concernId }, select: { id: true } }))) redirect(`/admin/results?tab=${tab}`);
+  const r = await db.result.updateMany({ where: { concernIds: { isEmpty: true } }, data: { concernIds: { set: [concernId] } } });
+  done();
+  redirect(`/admin/results?tab=${tab}&tagged=${r.count}`);
+}

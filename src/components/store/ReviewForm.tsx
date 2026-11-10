@@ -54,7 +54,7 @@ export function ReviewForm({ productId, productName }: { productId: string; prod
           <span className="ml-2 text-sm text-muted">{labels[hover || rating]}</span>
         </div>
       </fieldset>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5"><label htmlFor="r-name" className="label">Your name</label><input id="r-name" name="name" required autoComplete="name" className="field" /></div>
         <div className="flex flex-col gap-1.5"><label htmlFor="r-place" className="label">Town <span className="font-normal text-muted">(optional)</span></label><input id="r-place" name="place" autoComplete="address-level2" className="field" /></div>
       </div>

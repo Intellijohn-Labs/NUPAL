@@ -5,10 +5,10 @@ import { db } from "@/lib/db";
 import { PageHeader, Pill } from "@/components/admin/PageHeader";
 import { ConfirmButton, SubmitButton } from "@/components/admin/ui";
 import { ResultsInbox } from "@/components/admin/ResultsInbox";
-import { deleteResult, setResultStatus, swapResult, toggleResultFeatured, updateResult } from "./actions";
+import { deleteResult, setResultStatus, swapResult, tagUntaggedResults, toggleResultFeatured, updateResult } from "./actions";
 
 const PER_PAGE = 48;
-type SP = Promise<{ tab?: string; q?: string; page?: string; dup?: string }>;
+type SP = Promise<{ tab?: string; q?: string; page?: string; dup?: string; tagged?: string }>;
 
 export default async function ResultsAdmin({ searchParams }: { searchParams: SP }) {
   await requireArea("results");
@@ -16,11 +16,12 @@ export default async function ResultsAdmin({ searchParams }: { searchParams: SP 
   const tab = ["inbox", "DRAFT", "PUBLISHED", "HIDDEN"].includes(sp.tab ?? "") ? sp.tab! : "inbox";
   const q = (sp.q ?? "").trim();
   const page = Math.max(1, Number(sp.page) || 1);
-  const [inboxCount, counts, featuredCount, concerns] = await Promise.all([
+  const [inboxCount, counts, featuredCount, concerns, untagged] = await Promise.all([
     db.resultUpload.count(),
     db.result.groupBy({ by: ["status"], _count: true }),
     db.result.count({ where: { featured: true } }),
     db.concern.findMany({ orderBy: { sortOrder: "asc" }, select: { id: true, name: true } }),
+    db.result.count({ where: { concernIds: { isEmpty: true } } }),
   ]);
   const count = (s: ResultStatus) => counts.find((c) => c.status === s)?._count ?? 0;
   const tabs: [string, string, number][] = [
@@ -55,6 +56,27 @@ export default async function ResultsAdmin({ searchParams }: { searchParams: SP 
           </Link>
         ))}
       </div>
+
+      {sp.tagged !== undefined && (
+        <p role="status" className="mb-4 rounded-lg bg-[#e3eae5] px-4 py-3 text-sm text-[#1f4d36]">
+          {sp.tagged} result{sp.tagged === "1" ? "" : "s"} tagged. Their concern tile now shows on the Real Results page.
+        </p>
+      )}
+
+      {untagged > 0 && concerns.length > 0 && (
+        <form action={tagUntaggedResults} className="mb-5 flex flex-col gap-3 rounded-xl border border-[#e2c98f] bg-[#fdf6e6] p-4 sm:flex-row sm:items-center">
+          <input type="hidden" name="tab" value={tab} />
+          <p className="flex-1 text-sm text-[#5b4a1f]">
+            <strong>{untagged} result{untagged === 1 ? " has" : "s have"} no health concern.</strong> Untagged results only show under “All” on the Real Results page, and they don’t create a filter tile.
+          </p>
+          <label htmlFor="tag-concern" className="sr-only">Health concern</label>
+          <select id="tag-concern" name="concernId" required defaultValue={concerns.find((c) => /hair/i.test(c.name))?.id ?? ""} className="a-input sm:w-56">
+            <option value="" disabled>Choose a concern…</option>
+            {concerns.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+          <SubmitButton>Tag all {untagged}</SubmitButton>
+        </form>
+      )}
 
       {sp.dup && (
         <p role="alert" className="mb-4 rounded-lg bg-[#fbe6e0] px-4 py-3 text-sm text-[#a3361f]">

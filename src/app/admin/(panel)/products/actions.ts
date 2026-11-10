@@ -108,3 +108,36 @@ export async function toggleProduct(id: string, isActive: boolean) {
   await db.product.update({ where: { id }, data: { isActive } });
   revalidatePath("/", "layout");
 }
+
+/**
+ * “Tidy product photos”: makes already-uploaded product photos square with no white frame.
+ * Works through up to 16 photos per click (to stay within hosting time limits); click again for the rest.
+ */
+export async function tidyProductPhotos() {
+  await requireArea("products");
+  const { tidyStoredPhoto, TIDY_MARK } = await import("@/lib/product-photo");
+  const products = await db.product.findMany({ select: { id: true, images: true } });
+  const pending = products.flatMap((p) => p.images.filter((u) => !u.includes(TIDY_MARK) && !/\.svg(\?|$)/i.test(u)).map((u) => ({ id: p.id, url: u })));
+  const batch = pending.slice(0, 16);
+  let done = 0, failed = 0;
+  const replaced = new Map<string, Map<string, string>>();
+  for (const { id, url } of batch) {
+    try {
+      const next = await tidyStoredPhoto(url);
+      if (next) {
+        if (!replaced.has(id)) replaced.set(id, new Map());
+        replaced.get(id)!.set(url, next);
+        done++;
+      } else failed++;
+    } catch {
+      failed++;
+    }
+  }
+  for (const [id, map] of replaced) {
+    const p = products.find((x) => x.id === id)!;
+    await db.product.update({ where: { id }, data: { images: p.images.map((u) => map.get(u) ?? u) } });
+  }
+  revalidatePath("/", "layout");
+  const left = Math.max(0, pending.length - batch.length);
+  redirect(`/admin/products?tidied=${done}&left=${left}&skipped=${failed}`);
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ingredientList } from "@/lib/ingredients";
 import ReactMarkdown from "react-markdown";
 import { db } from "@/lib/db";
 import { cardInclude, toCard } from "@/lib/catalog";
@@ -53,7 +54,7 @@ export default async function ProductPage({ params, searchParams }: { params: P;
         <span className="text-ink">{p.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+      <div className="grid gap-10 lg:grid-cols-2">
         <ProductGallery images={p.images} name={p.name} type={p.type} videoUrl={p.videoUrl} />
         <div className="flex flex-col gap-5">
           <div>
@@ -99,7 +100,7 @@ export default async function ProductPage({ params, searchParams }: { params: P;
           {p.benefits.length > 0 && (
             <div>
               <h2 className="mb-3 text-xl">Benefits</h2>
-              <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <ul className="grid gap-2 sm:grid-cols-2">
                 {p.benefits.map((b) => (
                   <li key={b} className="flex items-start gap-2 rounded-xl border border-line px-3 py-2.5 text-[15px]">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#567459" strokeWidth="2" className="mt-0.5 shrink-0" aria-hidden="true">
@@ -114,7 +115,7 @@ export default async function ProductPage({ params, searchParams }: { params: P;
         </div>
       </div>
 
-      <div className="mt-14 grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr]">
+      <div className="mt-14 grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex flex-col gap-8">
           {p.description && (
             <section>
@@ -124,8 +125,18 @@ export default async function ProductPage({ params, searchParams }: { params: P;
           )}
           {p.ingredients && (
             <section>
-              <h2 className="mb-2 text-2xl">Ingredients</h2>
-              <div className="prose-nupal"><ReactMarkdown>{p.ingredients}</ReactMarkdown></div>
+              <h2 className="mb-3 text-2xl">Ingredients</h2>
+              <ul className="grid gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                {ingredientList(p.ingredients).map((x, i) => (
+                  <li key={`${i}-${x}`} className="flex items-start gap-2.5 leading-6 text-[#343B35]">
+                    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="mt-[3px] shrink-0">
+                      <path d="M5 19C5 10 11 5 20 4c-1 9-6 15-15 15z" fill="#EAF2E7" stroke="#397C42" strokeWidth="1.6" strokeLinejoin="round" />
+                      <path d="M5 19l9-9" stroke="#397C42" strokeWidth="1.6" strokeLinecap="round" />
+                    </svg>
+                    <span>{x}</span>
+                  </li>
+                ))}
+              </ul>
             </section>
           )}
           {p.dosage && (

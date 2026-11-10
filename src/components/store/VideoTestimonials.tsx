@@ -91,11 +91,11 @@ export function VideoTestimonials({ items, limit, step, heading = true }: Props)
   const v = playing ? parseVideo(playing.videoUrl) : null;
 
   return (
-    <section aria-labelledby={heading ? "stories" : undefined} aria-label={heading ? undefined : "Customer videos"} className={`overflow-hidden ${heading ? "bg-white py-20 sm:py-24" : "pb-16"}`}>
+    <section aria-labelledby={heading ? "stories" : undefined} aria-label={heading ? undefined : "Customer videos"} className={`overflow-hidden ${heading ? "py-20 sm:py-24" : "pb-16"}`}>
       <div className="container-x">
         {heading && (
           <Reveal className="mb-10">
-            <p className="text-xs font-medium uppercase tracking-[.18em] text-sage">Customer stories</p>
+            <p className="text-xs font-semibold uppercase tracking-[.18em] text-brick">Customer stories</p>
             <h2 id="stories" className="mt-1.5 text-[clamp(30px,3.6vw,46px)] leading-tight">In their own words</h2>
           </Reveal>
         )}

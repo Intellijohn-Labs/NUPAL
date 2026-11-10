@@ -150,6 +150,54 @@ async function main() {
       ],
     });
   }
+  // About page redesign: add Founder + Vision/Mission cards, put sections in the approved order,
+  // and remove leftover placeholder brackets from the chairman’s message. Safe to run again.
+  const aboutPage = await db.page.findUnique({ where: { slug: "about-us" }, include: { blocks: true } });
+  if (aboutPage) {
+    if (!aboutPage.blocks.some((b) => b.type === "founder")) {
+      await db.pageBlock.create({
+        data: {
+          pageId: aboutPage.id, type: "founder", title: "Our story is written in our DNA", anchor: "the-founder", sortOrder: 3,
+          data: {
+            eyebrow: "The founder",
+            quote: "Late Sri N. K. Padmanabhan Vaidyar’s gift was to find the root cause of illness — and treat it the Ayurvedic way.",
+            body: "His knowledge and inborn talent to diagnose the root causes of illness, and to save many lives from their terminally ill stages, made him world-renowned. He formulated over forty new medicines and is one of only eleven physicians honoured with **Vaidyavachaspathy**, the ultimate title in Ayurveda.\n\nHis knowledge lives on in every NUPAL medicine — like the DNA in a family.",
+            badge: "Vaidyavachaspathy",
+            badgeSub: "Ayurveda’s highest title",
+          },
+        },
+      });
+    }
+    if (!aboutPage.blocks.some((b) => b.type === "duo")) {
+      await db.pageBlock.create({
+        data: {
+          pageId: aboutPage.id, type: "duo", title: "Why we do what we do", anchor: "vision-and-mission", sortOrder: 4,
+          data: {
+            eyebrow: "Vision & mission",
+            cards: [
+              { title: "A vision that transcended time", text: "To revive Ayurveda by making it available to the world — packaging traditional formulations into convenient tablets and capsules while keeping their effectiveness intact." },
+              { title: "A mission to sustain healthy living", text: "To extend Ayurveda’s life-sustaining benefits to everyone, with a research team and a state-of-the-art facility conforming to CGMP as per WHO guidelines." },
+            ],
+          },
+        },
+      });
+    }
+    // Approved order. The older “About NUPAL” and “Vision & Mission” text sections go to the end so they can be deleted.
+    const order: Record<string, number> = { intro: 1, stats: 2, founder: 3, duo: 4, timeline: 5, cards: 6, message: 7, people: 8, logos: 9, gallery: 10 };
+    const fresh = await db.pageBlock.findMany({ where: { pageId: aboutPage.id } });
+    for (const b of fresh) {
+      const n = b.type === "text" ? 20 : order[b.type] ?? 15;
+      if (b.sortOrder !== n) await db.pageBlock.update({ where: { id: b.id }, data: { sortOrder: n } });
+      if (b.type === "message") {
+        const m = (b.data ?? {}) as { body?: string };
+        if (m.body && /\[Add the chairman|sage\]\s*$/.test(m.body)) {
+          const body = m.body.replace(/^\s*\[Add the chairman[’']s mes/, "").replace(/sage\]\s*$/, "").trim();
+          await db.pageBlock.update({ where: { id: b.id }, data: { data: { ...(b.data as object), body } } });
+        }
+      }
+    }
+  }
+
   for (const [slug, title, blocks] of [
     ["accreditations", "Accreditations & Approvals", [
       { type: "text", title: "", anchor: "", data: { body: "NUPAL’s manufacturing is certified to GMP, WHO-GMP and ISO 9001:2015 standards. [Confirm and add licence details.]" } },
@@ -162,6 +210,96 @@ async function main() {
   ] as const) {
     if (await db.page.findUnique({ where: { slug } })) continue;
     await db.page.create({ data: { slug, title, content: "", inFooter: false, blocks: { create: blocks.map((b, i) => ({ ...b, data: b.data as object, sortOrder: i + 1 })) } } });
+  }
+  // Team direction: six lead concerns with short lines, shown first on the homepage (only while taglines are empty).
+  const lead: [string, string][] = [
+    ["liver-health", "Everyday liver support"],
+    ["heart-health", "Traditional heart care"],
+    ["digestion-acidity", "Comfort after meals"],
+    ["hair-care", "Nourishing hair care"],
+    ["womens-health", "Support through every stage"],
+    ["cough-throat", "Herbal comfort, season to season"],
+  ];
+  if (!(await db.concern.count({ where: { tagline: { not: "" } } }))) {
+    for (const [i, [slug, tagline]] of lead.entries()) await db.concern.updateMany({ where: { slug }, data: { tagline, sortOrder: i + 1 } });
+    const rest = await db.concern.findMany({ where: { slug: { notIn: lead.map((l) => l[0]) } }, orderBy: { sortOrder: "asc" } });
+    for (const [i, c] of rest.entries()) await db.concern.update({ where: { id: c.id }, data: { sortOrder: 10 + i } });
+  }
+  const siteDir = await db.setting.findUnique({ where: { id: "site" } });
+  if (siteDir && (!Array.isArray(siteDir.homeCollections) || !siteDir.homeCollections.length)) {
+    await db.setting.update({
+      where: { id: "site" },
+      data: {
+        homeCollections: [
+          { title: "Everyday Wellness", text: "Explore Ayurvedic formulations for daily wellness and general wellbeing.", href: "/shop" },
+          { title: "Traditional Ayurvedic Formulations", text: "Discover classical Ayurvedic preparations rooted in traditional practice.", href: "/shop" },
+        ],
+        offerMessages: ["Cash on Delivery Available", "Consult Our Ayurvedic Doctors", "Ayurvedic Formulations Crafted in Kerala"],
+        whyPoints: [
+          { title: "Traditional Formulations", text: "Inspired by classical Ayurvedic knowledge." },
+          { title: "Quality Focused", text: "Prepared and checked with care." },
+          { title: "Made in Kerala", text: "Rooted in Kerala’s Ayurvedic tradition." },
+          { title: "Expert Guidance", text: "Qualified Ayurvedic physicians, one booking away." },
+        ],
+      },
+    });
+  }
+  // “Why Nupal” section: replace the earlier starter text (only if it is unchanged).
+  const herNow = (await db.setting.findUnique({ where: { id: "site" } }))?.heritage as Record<string, unknown> | null;
+  if (herNow && herNow.title === "Our story is written\nin our DNA") {
+    await db.setting.update({
+      where: { id: "site" },
+      data: {
+        heritage: {
+          show: true,
+          eyebrow: "Our story, in brief",
+          title: "Rooted in Tradition.\nCommitted to Your Wellbeing.",
+          quote: "",
+          body: "Nupal began in 1960 in Kochi, when Sri N. K. Padmanabhan Vaidyar, honoured with the title Vaidyavachaspathy, set up an Ayurvedic research centre to bring Ayurveda to everyday families. Our story is written in our DNA.",
+          year: 1960,
+          stats: [
+            { value: "1960", suffix: "", label: "Founded in Kochi" },
+            { value: "CGMP", suffix: "", label: "Guideline-based facility" },
+            { value: "Doctors", suffix: "", label: "Guidance on call" },
+          ],
+          certs: ["GMP", "WHO-GMP", "ISO 9001", "AYUSH"],
+          ctaLabel: "Discover Our Story →",
+          ctaHref: "/about-us",
+        },
+      },
+    });
+  }
+  // The first starter banner gets the team’s hero wording (only if unchanged).
+  await db.banner.updateMany({
+    where: { title: "Kerala Ayurveda,\nprescribed with care." },
+    data: { eyebrow: "Rooted in Ayurveda. Made with care.", title: "Ancient Wisdom.\nEveryday Wellness.", subtitle: "Ayurvedic formulations for everyday health, made in Kochi since 1960 and backed by qualified Ayurvedic doctors.", ctaLabel: "Shop Now", ctaHref: "/shop" },
+  });
+
+  // Homepage heritage band (DNA): starting content, only if not set yet.
+  const siteNow = await db.setting.findUnique({ where: { id: "site" } });
+  const her = siteNow?.heritage as Record<string, unknown> | null;
+  if (siteNow && (!her || !Object.keys(her).length)) {
+    await db.setting.update({
+      where: { id: "site" },
+      data: {
+        heritage: {
+          show: true,
+          eyebrow: "Our story, in brief",
+          title: "Rooted in Tradition.\nCommitted to Your Wellbeing.",
+          quote: "",
+          body: "Nupal began in 1960 in Kochi, when Sri N. K. Padmanabhan Vaidyar, honoured with the title Vaidyavachaspathy, set up an Ayurvedic research centre to bring Ayurveda to everyday families. Our story is written in our DNA.",
+          year: 1960,
+          stats: [
+            { value: "1960", suffix: "", label: "Founded in Kochi" },
+            { value: "CGMP", suffix: "", label: "Guideline-based facility" },
+            { value: "Doctors", suffix: "", label: "Guidance on call" },
+          ],
+          certs: ["GMP", "WHO-GMP", "ISO 9001", "AYUSH"],
+          ctaLabel: "Discover Our Story →",
+          ctaHref: "/about-us",
+        },
+      },
+    });
   }
   // Accreditations and CSR are linked from the footer.
   await db.page.updateMany({ where: { slug: { in: ["accreditations", "csr"] } }, data: { inFooter: true } });
@@ -183,15 +321,18 @@ async function main() {
   // Update the first starter banner to the new hero wording (only if it still has the original text).
   await db.banner.updateMany({
     where: { title: "Generations of Ayurvedic care, from Kochi" },
-    data: { eyebrow: "Generations of Ayurvedic care · Kochi", title: "Kerala Ayurveda,\nprescribed with care.", subtitle: "Classical and proprietary medicines for liver, hair, heart and everyday health — with Ayurvedic experts to guide you.", ctaLabel: "Shop bestsellers", ctaHref: "/#bestsellers", theme: "green" },
+    data: { eyebrow: "Rooted in Ayurveda. Made with care.", title: "Ancient Wisdom.\nEveryday Wellness.", subtitle: "Ayurvedic formulations for everyday health, made in Kochi since 1960 and backed by qualified Ayurvedic doctors.", ctaLabel: "Shop Now", ctaHref: "/shop", theme: "green" },
   });
-  if ((await db.banner.count()) === 0) {
-    await db.banner.createMany({
-      data: [
-        { eyebrow: "Generations of Ayurvedic care · Kochi", title: "Kerala Ayurveda,\nprescribed with care.", subtitle: "Classical and proprietary medicines for liver, hair, heart and everyday health — with Ayurvedic experts to guide you.", ctaLabel: "Shop bestsellers", ctaHref: "/#bestsellers", theme: "green", sortOrder: 1 },
-        { eyebrow: "Personal guidance", title: "Not sure what’s right?\nAsk our experts.", subtitle: "Consult our Ayurvedic experts by video, phone or at the clinic. Book in under a minute.", ctaLabel: "Book a consultation", ctaHref: "/consult", theme: "cream", sortOrder: 2 },
-      ],
-    });
+  // The four photo banners from NUPAL (Nov 2026). They replace the two starter text banners once.
+  const PHOTO_BANNERS = [
+    { eyebrow: "Excellence in Ayurveda since 1960", title: "Ancient Wisdom.\nEveryday Wellness.", subtitle: "Discover Kamilari Plus, rooted in Nupal’s longstanding Ayurvedic tradition and commitment to thoughtful formulations.", ctaLabel: "Explore Kamilari Plus", ctaHref: "/shop?q=kamilari", theme: "cream", imageDesktop: "/banners/kamilari-desktop.webp", imageMobile: "/banners/kamilari-mobile.webp" },
+    { eyebrow: "Personal care, rooted in Ayurveda", title: "Thoughtful Care.\nFor Every Health Journey.", subtitle: "Explore Ayurvedic formulations designed around different health and wellness needs.", ctaLabel: "Shop by Concern", ctaHref: "/#concerns", theme: "green", imageDesktop: "/banners/collection-desktop.webp", imageMobile: "/banners/collection-mobile.webp" },
+    { eyebrow: "The art of Ayurvedic hair care", title: "Nourish Your Hair.\nHonour Your Roots.", subtitle: "Discover Hairomax, a natural hair-fortifying oil inspired by traditional Ayurvedic hair care.", ctaLabel: "Explore Hairomax", ctaHref: "/shop?q=hairomax", theme: "green", imageDesktop: "/banners/hairomax-desktop.webp", imageMobile: "/banners/hairomax-mobile.webp" },
+    { eyebrow: "The beauty of traditional Ayurveda", title: "A Ritual of\nTimeless Beauty.", subtitle: "Rediscover traditional Ayurvedic beauty care with Sumangaly.", ctaLabel: "Explore Sumangaly", ctaHref: "/shop?q=sumangaly", theme: "brown", imageDesktop: "/banners/sumangaly-desktop.webp", imageMobile: "/banners/sumangaly-mobile.webp" },
+  ];
+  if ((await db.banner.count({ where: { imageDesktop: "/banners/kamilari-desktop.webp" } })) === 0) {
+    await db.banner.deleteMany({ where: { imageDesktop: null, title: { in: ["Ancient Wisdom.\nEveryday Wellness.", "Not sure what’s right?\nAsk our experts."] } } });
+    await db.banner.createMany({ data: PHOTO_BANNERS.map((x, i) => ({ ...x, sortOrder: i + 1, active: true })) });
   }
 
   const email = (process.env.SEED_ADMIN_EMAIL || "admin@nupalremedies.com").toLowerCase();
