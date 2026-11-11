@@ -124,8 +124,19 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
   const arrows =
     n > 1 ? (
       <>
-        <button type="button" onClick={() => go(-1)} aria-label="Previous banner" className="absolute left-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-forest shadow-sm transition hover:bg-white md:grid lg:left-6">‹</button>
-        <button type="button" onClick={() => go(1)} aria-label="Next banner" className="absolute right-4 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-forest shadow-sm transition hover:bg-white md:grid lg:right-6">›</button>
+        {[-1, 1].map((dir) => (
+          <button
+            key={dir}
+            type="button"
+            onClick={() => go(dir)}
+            aria-label={dir < 0 ? "Previous banner" : "Next banner"}
+            className={`absolute top-1/2 z-10 hidden h-14 w-10 -translate-y-1/2 place-items-center transition-[opacity,transform] md:grid ${dir < 0 ? "left-2 hover:-translate-x-0.5 lg:left-4" : "right-2 hover:translate-x-0.5 lg:right-4"} ${b.imageDesktop ? "text-white opacity-80 drop-shadow-[0_2px_6px_rgba(0,0,0,.55)] hover:opacity-100" : "text-[#174D36] opacity-70 hover:opacity-100"}`}
+          >
+            <svg width="22" height="40" viewBox="0 0 22 40" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d={dir < 0 ? "M18 3L4 20l14 17" : "M4 3l14 17L4 37"} />
+            </svg>
+          </button>
+        ))}
       </>
     ) : null;
 
@@ -148,12 +159,12 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
     return (
       <section aria-roledescription="carousel" aria-label="Featured" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} className="relative overflow-hidden" style={{ background: panel }}>
         {!hasText ? (
-          <Link key={b.id} href={b.ctaHref} aria-label={b.ctaLabel || "View offer"} className="fade-in relative block h-[calc(100svh-104px-64px)] min-h-[520px] md:h-[calc(100svh-170px)] md:min-h-[560px]">
+          <Link key={b.id} href={b.ctaHref} aria-label={b.ctaLabel || "View offer"} className="fade-in relative block h-[calc(100svh-100px-64px)] min-h-[520px] md:h-[calc(100svh-100px)] lg:h-[calc(100svh-112px)] md:min-h-[560px]">
             {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover md:hidden" sizes="100vw" />}
             <Image src={b.imageDesktop} alt="" fill priority className={`object-cover ${b.imageMobile ? "hidden md:block" : ""}`} sizes="100vw" />
           </Link>
         ) : (
-          <div key={b.id} className="fade-in relative flex min-h-[calc(100svh-104px-64px)] flex-col md:block md:h-[calc(100svh-170px)] md:min-h-[560px]">
+          <div key={b.id} className="fade-in relative flex min-h-[calc(100svh-100px-64px)] flex-col md:block md:h-[calc(100svh-100px)] lg:h-[calc(100svh-112px)] md:min-h-[560px]">
             {/* photo */}
             <div className="relative aspect-square max-h-[56svh] w-full md:absolute md:inset-0 md:aspect-auto md:max-h-none">
               {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover object-[50%_45%] md:hidden" sizes="100vw" />}
@@ -161,17 +172,17 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
               {/* phones: fade the photo into the text panel */}
               <div className="absolute inset-x-0 bottom-0 h-1/3 md:hidden" style={{ background: `linear-gradient(to bottom, transparent, ${panel})` }} />
               {/* desktop: soft shade on the left so the writing reads clearly */}
-              <div className="absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.32) 34%, rgba(0,0,0,0) 58%)" }} />
+              <div className="absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.38) 36%, rgba(0,0,0,0) 62%)" }} />
             </div>
             {/* writing */}
             <div className="container-x relative -mt-6 flex flex-1 flex-col items-center justify-center pb-6 text-center text-white md:mt-0 md:h-full md:items-start md:pb-16 md:text-left lg:px-16">
-              <div className="flex w-full flex-col items-center md:max-w-[560px] md:items-start">
-                {b.eyebrow && <p className="hero-in text-[11px] font-medium uppercase tracking-[.14em] text-[#E7C88F] sm:text-[13px]">{b.eyebrow}</p>}
-                <h1 className="hero-in mt-2 text-[clamp(28px,4.2vw,62px)] leading-[1.1] [text-shadow:0_2px_18px_rgba(0,0,0,.35)] sm:mt-3" style={{ animationDelay: ".06s" }}>
+              <div className="flex w-full flex-col items-center md:max-w-[min(760px,58%)] md:items-start">
+                {b.eyebrow && <p className="hero-in text-[11px] font-medium uppercase tracking-[.14em] text-[#E7C88F] [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_14px_rgba(0,0,0,.5)] sm:text-[13px]">{b.eyebrow}</p>}
+                <h1 className="hero-in mt-2 text-[clamp(28px,3.7vw,60px)] leading-[1.1] [text-shadow:0_2px_4px_rgba(0,0,0,.45),0_4px_28px_rgba(0,0,0,.55)] sm:mt-3 md:[&>span]:whitespace-nowrap" style={{ animationDelay: ".06s" }}>
                   {head.map((l, k) => <span key={k} className="block">{l}</span>)}
                   {last && <span className="block text-[#E7C88F]">{last}</span>}
                 </h1>
-                {b.subtitle && <p className="hero-in mt-3 max-w-[460px] text-[14px] leading-6 text-white/85 sm:mt-5 sm:text-lg sm:leading-8" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>}
+                {b.subtitle && <p className="hero-in mt-3 max-w-[480px] text-[14px] leading-6 text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_16px_rgba(0,0,0,.55)] sm:mt-5 sm:text-lg sm:leading-8" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>}
                 {b.ctaLabel && (
                   <Link href={b.ctaHref} className="hero-in mt-5 inline-flex h-[52px] w-full items-center justify-center rounded-lg bg-white px-10 text-base font-medium text-[#174D36] transition-colors hover:bg-[#F4EBD2] sm:mt-8 md:h-14 md:w-auto" style={{ animationDelay: ".18s" }}>
                     {b.ctaLabel}
@@ -180,7 +191,7 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
                 {chips.length > 0 && (
                   <ul className="hero-in mt-4 flex w-full justify-between gap-1 md:mt-7 md:w-auto md:justify-start md:gap-5" style={{ animationDelay: ".24s" }}>
                     {chips.map((x) => (
-                      <li key={x} className="flex items-center gap-1 whitespace-nowrap text-[11px] text-white/85 md:gap-1.5 md:text-sm">
+                      <li key={x} className="flex items-center gap-1 whitespace-nowrap text-[11px] text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.65)] md:gap-1.5 md:text-sm">
                         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 text-[#E7C88F]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" /></svg>
                         {x}
                       </li>
@@ -212,7 +223,7 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
       <svg viewBox="0 0 200 420" aria-hidden="true" className="pointer-events-none absolute -bottom-10 -left-10 w-[90px] opacity-40 md:hidden"><path d="M40 420C-10 300 20 120 150 10c40 150 10 330-110 410z" fill="#8FA36A" /></svg>
       <svg viewBox="0 0 200 420" aria-hidden="true" className="pointer-events-none absolute -bottom-10 -right-10 w-[90px] -scale-x-100 opacity-40 md:hidden"><path d="M40 420C-10 300 20 120 150 10c40 150 10 330-110 410z" fill="#8FA36A" /></svg>
 
-      <div key={b.id} className="fade-in container-x relative grid min-h-[calc(100svh-104px-64px)] content-center items-center gap-4 pb-6 pt-5 text-center md:min-h-[calc(100svh-170px)] md:grid-cols-[1.1fr_.9fr] md:gap-8 md:pb-24 md:pt-8 md:text-left lg:px-16">
+      <div key={b.id} className="fade-in container-x relative grid min-h-[calc(100svh-100px-64px)] content-center items-center gap-4 pb-6 pt-5 text-center md:min-h-[calc(100svh-100px)] lg:min-h-[calc(100svh-112px)] md:grid-cols-[1.1fr_.9fr] md:gap-8 md:pb-24 md:pt-8 md:text-left lg:px-16">
         {/* artwork: top half on phones, right side on desktop */}
         <div className="order-first md:order-last">
           <Stage products={products} theme={b.theme} />

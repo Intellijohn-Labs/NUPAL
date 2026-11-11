@@ -78,7 +78,7 @@ export default async function CmsPage({ params }: { params: P }) {
       </header>
       {withNav ? (
         <div className="container-x grid items-start gap-10 py-14 sm:py-20 lg:grid-cols-[240px_1fr] lg:gap-14">
-          <nav aria-label="On this page" className="top-[137px] hidden flex-col gap-1 lg:sticky lg:flex">
+          <nav aria-label="On this page" className="top-[100px] hidden flex-col gap-1 lg:sticky lg:flex">
             <p className="mb-2 text-xs font-medium uppercase tracking-[.16em] text-muted">On this page</p>
             {sections.map((sc) => (
               <a key={sc.id} href={`#${sc.anchor}`} data-spy={sc.anchor}
@@ -88,7 +88,7 @@ export default async function CmsPage({ params }: { params: P }) {
             ))}
           </nav>
           {/* mobile: horizontal pill row */}
-          <nav aria-label="On this page" data-pills className="no-scrollbar sticky top-[129px] z-20 -mx-4 flex overflow-x-auto border-b border-line bg-mint/95 px-4 py-2.5 backdrop-blur lg:hidden">
+          <nav aria-label="On this page" data-pills className="no-scrollbar sticky top-[64px] z-20 -mx-4 flex overflow-x-auto border-b border-line bg-mint/95 px-4 py-2.5 backdrop-blur lg:hidden">
             {sections.map((sc) => (
               <a key={sc.id} href={`#${sc.anchor}`} data-spy={sc.anchor}
                 className="mr-2 shrink-0 rounded-full border border-line bg-white px-4 py-2 text-[14px] text-muted transition-colors data-[on]:border-forest data-[on]:bg-forest data-[on]:text-white">

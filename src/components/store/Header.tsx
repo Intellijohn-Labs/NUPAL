@@ -1,123 +1,185 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "./CartProvider";
 import { Logo } from "./Logo";
 
 type Concern = { name: string; slug: string };
+type Panel = "concerns" | "search" | "menu" | null;
 
+const POPULAR = ["Kamilari", "Hairomax", "Liver care", "Diawin", "Sumangaly"];
+
+const navLink =
+  "relative py-2 text-[12.5px] font-medium uppercase tracking-[.06em] text-ink whitespace-nowrap after:absolute after:inset-x-0 after:bottom-0.5 after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-forest after:transition-transform after:duration-300 hover:after:scale-x-100 xl:text-[13px]";
+
+/**
+ * Header (approved mockup, Ujala-style): white bar, menu in small capitals split around a centred logo,
+ * a lens icon that opens a search panel, and the bag. Phones: menu button, centred logo, lens and bag.
+ */
 export function Header({ concerns }: { concerns: Concern[]; types?: string[] }) {
   const { count } = useCart();
-  const [open, setOpen] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
+  const [panel, setPanel] = useState<Panel>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const path = usePathname();
 
-  // Close dropdowns when clicking outside them, and when another one opens.
+  const toggle = (p: Exclude<Panel, null>) => setPanel((cur) => (cur === p ? null : p));
+  const close = () => setPanel(null);
+
+  // Close on route change, Esc, or a click outside the header. The phone bar’s menu button opens the menu.
+  useEffect(close, [path]);
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
-      navRef.current?.querySelectorAll("details[open]").forEach((d) => {
-        if (!d.contains(e.target as Node)) d.removeAttribute("open");
-      });
+      if (!headerRef.current?.contains(e.target as Node)) close();
     };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    const onMenu = () => setPanel((cur) => (cur === "menu" ? null : "menu"));
     document.addEventListener("click", onDoc);
-    const toggle = () => setOpen((o) => !o);
-    window.addEventListener("nupal:menu", toggle);
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("nupal:menu", onMenu);
     return () => {
       document.removeEventListener("click", onDoc);
-      window.removeEventListener("nupal:menu", toggle);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("nupal:menu", onMenu);
     };
   }, []);
-  const pick = (e: React.MouseEvent) => {
-    setOpen(false);
-    (e.currentTarget as HTMLElement).closest("details")?.removeAttribute("open");
+  useEffect(() => {
+    if (panel === "search") setTimeout(() => searchRef.current?.focus(), 30);
+  }, [panel]);
+
+  const go = (q: string) => {
+    close();
+    router.push(`/shop?q=${encodeURIComponent(q)}`);
   };
 
+  const icon = "relative grid h-11 w-11 place-items-center rounded-full text-ink transition-colors hover:bg-[#F4F1E8]";
+  const sheet = "absolute inset-x-0 top-full border-b border-line bg-white shadow-[0_24px_40px_-30px_rgba(0,0,0,.35)]";
+
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-      <div className="container-x flex items-center gap-3 py-2.5 sm:gap-6 sm:py-3">
-        <button
-          type="button"
-          className="-ml-2 hidden h-11 w-11 items-center justify-center"
-          aria-label="Open menu"
-          aria-expanded={open}
-          onClick={() => setOpen((o) => !o)}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-            <path d={open ? "M6 6l12 12M18 6L6 18" : "M4 7h16M4 12h16M4 17h16"} />
-          </svg>
-        </button>
-        <Logo className="h-8 w-auto sm:h-11" />
+    <header ref={headerRef} className="sticky top-0 z-40 border-b border-line bg-white">
+      <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6 lg:h-[76px] lg:px-8 xl:px-12">
+        {/* left: menu button (phones) / first half of the menu (desktop) */}
+        <div className="flex items-center">
+          <button type="button" aria-label={panel === "menu" ? "Close menu" : "Open menu"} aria-expanded={panel === "menu"} aria-controls="site-menu" onClick={() => toggle("menu")} className={`${icon} -ml-2.5 lg:hidden`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+              <path d={panel === "menu" ? "M6 6l12 12M18 6L6 18" : "M4 7h16M4 12h16M4 17h16"} />
+            </svg>
+          </button>
+          <nav aria-label="Shop" className="hidden items-center gap-6 lg:flex xl:gap-9">
+            <Link href="/shop" className={navLink}>Shop All</Link>
+            <button type="button" aria-expanded={panel === "concerns"} aria-controls="concern-menu" onClick={() => toggle("concerns")} className={`${navLink} flex items-center gap-1.5 ${panel === "concerns" ? "after:scale-x-100" : ""}`}>
+              Shop by Concern
+              <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" className={`transition-transform ${panel === "concerns" ? "rotate-180" : ""}`}><path d="M1 3l4 4 4-4z" /></svg>
+            </button>
+            <Link href="/#bestsellers" className={navLink}>Bestsellers</Link>
+          </nav>
+        </div>
 
-        <form action="/shop" role="search" className="flex h-11 min-w-0 flex-1 items-center sm:h-12 gap-2 rounded-full border border-line bg-white px-5 transition-colors focus-within:border-sage lg:order-none lg:w-auto lg:flex-1">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5E6862" strokeWidth="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.5-3.5" />
-          </svg>
-          <label htmlFor="site-search" className="sr-only">
-            Search products
-          </label>
-          <input
-            id="site-search"
-            name="q"
-            type="search"
-            placeholder="Search “Kamilari”, “liver care”…"
-            className="h-full min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted"
-          />
-        </form>
+        {/* centre: logo */}
+        <Logo className="h-8 w-auto lg:h-10" />
 
-        <div className="ml-auto hidden items-center gap-1 lg:ml-0 lg:flex">
-          <Link href="/consult" className="btn hidden h-11 bg-forest px-5 text-sm text-cream hover:bg-forest-deep sm:inline-flex">
-            Consult an expert
-          </Link>
-          <Link href="/cart" aria-label={`Cart, ${count} items`} className="relative flex h-11 w-11 items-center justify-center">
-            <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-              <path d="M6 7h12l-1 13H7z" />
-              <path d="M9 7a3 3 0 0 1 6 0" />
+        {/* right: rest of the menu (desktop), lens and bag */}
+        <div className="flex items-center justify-end gap-1">
+          <nav aria-label="More" className="mr-3 hidden items-center gap-6 lg:flex xl:mr-5 xl:gap-9">
+            <Link href="/consult" className={`${navLink} flex items-center gap-2 font-semibold text-forest`}>
+              <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-[#3E8E4A] shadow-[0_0_0_3px_#DCEFDB]" />
+              Consult a Doctor
+            </Link>
+            <Link href="/about-us" className={navLink}>About Nupal</Link>
+          </nav>
+          <button type="button" aria-label="Search" aria-expanded={panel === "search"} aria-controls="site-search-panel" onClick={() => toggle("search")} className={`${icon} ${panel === "search" ? "bg-[#F4F1E8]" : ""}`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="M15.5 15.5L20 20" />
+            </svg>
+          </button>
+          <Link href="/cart" aria-label={`Cart, ${count} items`} className={`${icon} -mr-2.5`}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 8h14l-1 12H6L5 8z" />
+              <path d="M9 8V6.5a3 3 0 0 1 6 0V8" />
             </svg>
             {count > 0 && (
-              <span className="absolute right-0 top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-pestle px-1 text-[11px] font-semibold text-white">
-                {count}
-              </span>
+              <span className="absolute right-1 top-1 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-brick px-1 text-[10.5px] font-semibold text-white">{count}</span>
             )}
           </Link>
         </div>
       </div>
 
-      <nav ref={navRef} aria-label="Main" className={`border-t border-line bg-cream ${open ? "block" : "hidden"} lg:block`}>
-        <div className="container-x flex flex-col gap-1 py-2 text-[15px] font-medium lg:flex-row lg:items-center lg:gap-8 lg:py-0 lg:text-base">
-          <Link href="/shop" className="border-b-2 border-transparent py-2 hover:border-leaf lg:py-3" onClick={pick}>
-            Shop All
-          </Link>
-          {/* Mega menu: every health concern lives here; only six show on the homepage */}
-          <details className="group relative lg:py-3">
-            <summary className="flex cursor-pointer list-none items-center gap-1 border-b-2 border-transparent py-2 hover:border-leaf lg:py-0">
-              Shop by Concern <span aria-hidden="true" className="text-xs">▾</span>
-            </summary>
-            <div className="py-2 pl-3 lg:absolute lg:left-0 lg:top-full lg:z-50 lg:mt-2 lg:w-[520px] lg:rounded-2xl lg:border lg:border-line lg:bg-white lg:px-6 lg:py-5 lg:shadow-[0_24px_50px_-28px_rgba(0,0,0,.4)]">
-              <p className="mb-2 hidden text-xs uppercase tracking-[.14em] text-muted lg:block">Shop by concern</p>
-              <div className="grid gap-x-6 gap-y-1 lg:grid-cols-2">
-                {concerns.map((c) => (
-                  <Link key={c.slug} href={`/concern/${c.slug}`} className="rounded-lg px-2 py-2 font-normal hover:bg-mist lg:px-0 lg:hover:bg-transparent lg:hover:text-brick" onClick={pick}>
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
-              <Link href="/concerns" className="mt-3 inline-block px-2 font-semibold text-brick lg:px-0" onClick={pick}>
-                Explore all health concerns →
-              </Link>
+      {/* Shop by Concern (desktop) */}
+      {panel === "concerns" && (
+        <div id="concern-menu" className={`${sheet} hidden lg:block`}>
+          <div className="container-x py-7">
+            <p className="text-xs font-semibold uppercase tracking-[.14em] text-muted">Shop by health concern</p>
+            <div className="mt-3 grid max-w-[900px] grid-cols-4 gap-x-8 gap-y-1">
+              {concerns.map((c) => (
+                <Link key={c.slug} href={`/concern/${c.slug}`} className="py-2 text-[15px] hover:text-brick">{c.name}</Link>
+              ))}
             </div>
-          </details>
-          <Link href="/#bestsellers" className="border-b-2 border-transparent py-2 hover:border-leaf lg:py-3" onClick={pick}>
-            Bestsellers
-          </Link>
-          <Link href="/consult" className="border-b-2 border-transparent py-2 hover:border-leaf lg:py-3" onClick={pick}>
-            Consult a Doctor
-          </Link>
-          <Link href="/about-us" className="border-b-2 border-transparent py-2 hover:border-leaf lg:py-3" onClick={pick}>
-            About Nupal
-          </Link>
+            <Link href="/concerns" className="mt-4 inline-block text-sm font-semibold text-brick hover:underline">Explore all health concerns →</Link>
+          </div>
         </div>
-      </nav>
+      )}
+
+      {/* Search panel (lens) */}
+      {panel === "search" && (
+        <div id="site-search-panel" className={sheet}>
+          <div className="container-x py-5 sm:py-7">
+            <form
+              role="search"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = searchRef.current?.value.trim();
+                if (q) go(q);
+              }}
+              className="mx-auto flex max-w-[720px] items-center gap-3 border-b-[1.5px] border-ink pb-2"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" className="shrink-0 text-muted">
+                <circle cx="10.5" cy="10.5" r="6.5" />
+                <path d="M15.5 15.5L20 20" />
+              </svg>
+              <label htmlFor="site-search" className="sr-only">Search products</label>
+              <input ref={searchRef} id="site-search" name="q" type="search" autoComplete="off" placeholder="Search “Kamilari”, “liver care”…" className="h-10 min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-muted sm:text-xl" />
+              <button type="button" onClick={close} className="shrink-0 text-xs font-medium uppercase tracking-[.08em] text-muted hover:text-ink">Close</button>
+            </form>
+            <div className="mx-auto mt-4 flex max-w-[720px] flex-wrap items-center gap-2 text-sm text-muted">
+              Popular:
+              {POPULAR.map((p) => (
+                <button key={p} type="button" onClick={() => go(p)} className="rounded-full border border-line px-3 py-1.5 text-ink hover:border-forest">{p}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phone menu */}
+      {panel === "menu" && (
+        <nav id="site-menu" aria-label="Main" className={`${sheet} max-h-[calc(100svh-120px)] overflow-y-auto lg:hidden`}>
+          <div className="container-x pb-4 pt-1 text-[14px] font-medium uppercase tracking-[.06em]">
+            <Link href="/shop" className="block border-b border-line py-3.5">Shop All</Link>
+            <details className="group border-b border-line">
+              <summary className="flex cursor-pointer list-none items-center justify-between py-3.5">
+                Shop by Concern
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" className="transition-transform group-open:rotate-180"><path d="M1 3l4 4 4-4z" /></svg>
+              </summary>
+              <div className="pb-3 normal-case tracking-normal">
+                {concerns.map((c) => (
+                  <Link key={c.slug} href={`/concern/${c.slug}`} className="block py-2.5 pl-3 font-normal">{c.name}</Link>
+                ))}
+                <Link href="/concerns" className="block py-2.5 pl-3 font-semibold text-brick">Explore all health concerns →</Link>
+              </div>
+            </details>
+            <Link href="/#bestsellers" className="block border-b border-line py-3.5">Bestsellers</Link>
+            <Link href="/consult" className="flex items-center gap-2 border-b border-line py-3.5 font-semibold text-forest">
+              <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-[#3E8E4A] shadow-[0_0_0_3px_#DCEFDB]" />
+              Consult a Doctor
+            </Link>
+            <Link href="/about-us" className="block py-3.5">About Nupal</Link>
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

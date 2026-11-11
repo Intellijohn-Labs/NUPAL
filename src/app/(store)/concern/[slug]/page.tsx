@@ -122,7 +122,7 @@ export default async function ConcernPage({ params }: { params: P }) {
       </section>
 
       {/* Section menu */}
-      <nav aria-label="On this page" className="sticky top-[129px] z-30 border-b border-line bg-white/95 backdrop-blur lg:top-[121px]">
+      <nav aria-label="On this page" className="sticky top-16 z-30 border-b border-line bg-white/95 backdrop-blur lg:top-[76px]">
         <ul className="container-x no-scrollbar flex gap-1 overflow-x-auto py-2">
           {nav.map((n) => (
             <li key={n.id} className="shrink-0">
