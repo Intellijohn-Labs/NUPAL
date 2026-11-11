@@ -150,8 +150,9 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
     ) : null;
 
   // Photo banner: the picture fills the screen edge to edge.
-  // With text: on desktop the writing sits on the photo's open left side; on phones the photo is on top
-  // and the writing sits on a panel below it (colour from "Background colour"), so no pack is covered.
+  // With text: on desktop the writing sits on the photo's open left side; on phones the writing sits over the
+  // top of the photo on a deep shade, and the button and trust points sit on a panel below it
+  // (colour from "Background colour"), so the packs in the middle of the picture stay clear.
   // Without a small line or supporting text (writing already in the picture), the whole banner is one link.
   if (b.imageDesktop) {
     const hasText = Boolean(b.eyebrow.trim() || b.subtitle.trim());
@@ -165,26 +166,51 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
           </Link>
         ) : (
           <div key={b.id} className="fade-in relative flex min-h-[calc(100svh-100px-64px)] flex-col md:block md:h-[calc(100svh-100px)] lg:h-[calc(100svh-112px)] md:min-h-[560px]">
-            {/* photo */}
-            <div className="relative aspect-square max-h-[56svh] w-full md:absolute md:inset-0 md:aspect-auto md:max-h-none">
-              {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover object-[50%_45%] md:hidden" sizes="100vw" />}
+            {/* photo — phones: fills the screen above the button, with the writing over its top */}
+            <div className="relative min-h-[60svh] w-full flex-1 md:absolute md:inset-0 md:min-h-0">
+              {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover object-[50%_60%] md:hidden" sizes="100vw" />}
               <Image src={b.imageDesktop} alt="" fill priority className={`object-cover object-right ${b.imageMobile ? "hidden md:block" : ""}`} sizes="100vw" />
-              {/* phones: fade the photo into the text panel */}
-              <div className="absolute inset-x-0 bottom-0 h-1/3 md:hidden" style={{ background: `linear-gradient(to bottom, transparent, ${panel})` }} />
+              {/* phones: deep shade at the top for the writing, and a fade into the button panel at the bottom */}
+              <div className="absolute inset-x-0 top-0 h-[58%] md:hidden" style={{ background: `linear-gradient(to bottom, ${panel}F2 0%, ${panel}C7 28%, ${panel}66 62%, transparent 100%)` }} />
+              <div className="absolute inset-x-0 bottom-0 h-1/4 md:hidden" style={{ background: `linear-gradient(to bottom, transparent, ${panel})` }} />
               {/* desktop: soft shade on the left so the writing reads clearly */}
               <div className="absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.38) 36%, rgba(0,0,0,0) 62%)" }} />
-            </div>
-            {/* writing */}
-            <div className="container-x relative -mt-6 flex flex-1 flex-col items-center justify-center pb-6 text-center text-white md:mt-0 md:h-full md:items-start md:pb-16 md:text-left lg:px-16">
-              <div className="flex w-full flex-col items-center md:max-w-[min(760px,58%)] md:items-start">
-                {b.eyebrow && <p className="hero-in text-[11px] font-medium uppercase tracking-[.14em] text-[#E7C88F] [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_14px_rgba(0,0,0,.5)] sm:text-[13px]">{b.eyebrow}</p>}
-                <h1 className="hero-in mt-2 text-[clamp(28px,3.7vw,60px)] leading-[1.1] [text-shadow:0_2px_4px_rgba(0,0,0,.45),0_4px_28px_rgba(0,0,0,.55)] sm:mt-3 md:[&>span]:whitespace-nowrap" style={{ animationDelay: ".06s" }}>
+              {/* phones: the writing, centred over the top of the photo */}
+              <div className="container-x absolute inset-x-0 top-0 flex flex-col items-center pt-8 text-center text-white md:hidden">
+                {b.eyebrow && (
+                  <p className="hero-in flex items-center gap-2.5 text-[10.5px] font-medium uppercase tracking-[.22em] text-[#E7C88F]">
+                    <span aria-hidden="true" className="h-px w-5 shrink-0 bg-gradient-to-r from-transparent to-[#E7C88F]" />
+                    {b.eyebrow}
+                    <span aria-hidden="true" className="h-px w-5 shrink-0 bg-gradient-to-l from-transparent to-[#E7C88F]" />
+                  </p>
+                )}
+                <h1 className="hero-in mt-3 text-[clamp(30px,8.6vw,40px)] leading-[1.08] [text-shadow:0_2px_18px_rgba(0,0,0,.45)]" style={{ animationDelay: ".06s" }}>
                   {head.map((l, k) => <span key={k} className="block">{l}</span>)}
                   {last && <span className="block text-[#E7C88F]">{last}</span>}
                 </h1>
-                {b.subtitle && <p className="hero-in mt-3 max-w-[480px] text-[14px] leading-6 text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_16px_rgba(0,0,0,.55)] sm:mt-5 sm:text-lg sm:leading-8" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>}
+                {b.subtitle && (
+                  <>
+                    <span aria-hidden="true" className="hero-in mt-4 flex items-center gap-1.5" style={{ animationDelay: ".1s" }}>
+                      <span className="h-px w-8 bg-[#E7C88F]/70" />
+                      <span className="h-1.5 w-1.5 rotate-45 bg-[#E7C88F]" />
+                      <span className="h-px w-8 bg-[#E7C88F]/70" />
+                    </span>
+                    <p className="hero-in mt-3 max-w-[320px] text-[14px] leading-[1.6] text-white/90 [text-shadow:0_1px_10px_rgba(0,0,0,.5)]" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>
+                  </>
+                )}
+              </div>
+            </div>
+            {/* writing — desktop: all of it on the photo's left; phones: just the button and trust points */}
+            <div className="container-x relative flex flex-col items-center justify-center pb-5 pt-1 text-center text-white md:h-full md:items-start md:pb-16 md:pt-0 md:text-left lg:px-16">
+              <div className="flex w-full flex-col items-center md:max-w-[min(760px,58%)] md:items-start">
+                {b.eyebrow && <p className="hero-in hidden text-[13px] font-medium uppercase tracking-[.14em] text-[#E7C88F] [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_14px_rgba(0,0,0,.5)] md:block">{b.eyebrow}</p>}
+                <h1 className="hero-in mt-3 hidden text-[clamp(28px,3.7vw,60px)] leading-[1.1] [text-shadow:0_2px_4px_rgba(0,0,0,.45),0_4px_28px_rgba(0,0,0,.55)] md:block md:[&>span]:whitespace-nowrap" style={{ animationDelay: ".06s" }}>
+                  {head.map((l, k) => <span key={k} className="block">{l}</span>)}
+                  {last && <span className="block text-[#E7C88F]">{last}</span>}
+                </h1>
+                {b.subtitle && <p className="hero-in mt-5 hidden max-w-[480px] text-lg leading-8 text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_16px_rgba(0,0,0,.55)] md:block" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>}
                 {b.ctaLabel && (
-                  <Link href={b.ctaHref} className="hero-in mt-5 inline-flex h-[52px] w-full items-center justify-center rounded-lg bg-white px-10 text-base font-medium text-[#174D36] transition-colors hover:bg-[#F4EBD2] sm:mt-8 md:h-14 md:w-auto" style={{ animationDelay: ".18s" }}>
+                  <Link href={b.ctaHref} className="hero-in inline-flex h-[52px] w-full items-center justify-center rounded-lg bg-white px-10 text-base font-medium text-[#174D36] transition-colors hover:bg-[#F4EBD2] md:mt-8 md:h-14 md:w-auto" style={{ animationDelay: ".18s" }}>
                     {b.ctaLabel}
                   </Link>
                 )}
