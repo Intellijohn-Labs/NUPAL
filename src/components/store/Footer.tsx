@@ -64,7 +64,7 @@ export function Footer({ pages, settings, socials }: Props) {
         <div>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[.14em] text-gold">Explore</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
-            <li><Link href="/about-us" className="hover:text-white">About Nupal</Link></li>
+            <li><Link href="/our-story" className="hover:text-white">Our Story</Link></li>
             <li><Link href="/stories" className="hover:text-white">Customer Experiences</Link></li>
             <li><Link href="/reviews" className="hover:text-white">Customer Reviews</Link></li>
             <li><Link href="/consult" className="hover:text-white">Consultation</Link></li>
@@ -74,7 +74,7 @@ export function Footer({ pages, settings, socials }: Props) {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[.14em] text-gold">Support &amp; information</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
             {pages.map((p) => (
-              <li key={p.slug}><Link href={`/${p.slug}`} className="hover:text-white">{p.title}</Link></li>
+              <li key={p.slug}><Link href={p.slug === "about-us" ? "/our-story" : `/${p.slug}`} className="hover:text-white">{p.title}</Link></li>
             ))}
           </ul>
         </div>

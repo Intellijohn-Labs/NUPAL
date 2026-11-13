@@ -88,7 +88,7 @@ export function Header({ concerns }: { concerns: Concern[]; types?: string[] }) 
               <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-[#3E8E4A] shadow-[0_0_0_3px_#DCEFDB]" />
               Consult a Doctor
             </Link>
-            <Link href="/about-us" className={navLink}>About Nupal</Link>
+            <Link href="/our-story" className={navLink}>Our Story</Link>
           </nav>
           <button type="button" aria-label="Search" aria-expanded={panel === "search"} aria-controls="site-search-panel" onClick={() => toggle("search")} className={`${icon} ${panel === "search" ? "bg-[#F4F1E8]" : ""}`}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
@@ -176,7 +176,7 @@ export function Header({ concerns }: { concerns: Concern[]; types?: string[] }) 
               <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-[#3E8E4A] shadow-[0_0_0_3px_#DCEFDB]" />
               Consult a Doctor
             </Link>
-            <Link href="/about-us" className="block py-3.5">About Nupal</Link>
+            <Link href="/our-story" className="block py-3.5">Our Story</Link>
           </div>
         </nav>
       )}

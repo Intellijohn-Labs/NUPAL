@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { saveBlock } from "@/app/admin/(panel)/pages/block-actions";
-import { BLOCK_LABELS, type DuoData, type FounderData, type CardsData, type GalleryData, type IntroData, type Logo, type LogosData, type MessageData, type PeopleData, type Person, type StatsData, type TextData, type TimelineData } from "@/lib/blocks";
+import { BLOCK_LABELS, type DuoData, type HeroData, type FounderData, type CardsData, type GalleryData, type IntroData, type Logo, type LogosData, type MessageData, type PeopleData, type Person, type StatsData, type TextData, type TimelineData } from "@/lib/blocks";
 import { ImageField } from "./ImageField";
 import { SubmitButton } from "./ui";
 
@@ -17,13 +17,19 @@ export function BlockEditor({ block, pageSlug }: { block: Block; pageSlug: strin
 
   return (
     <form action={saveBlock.bind(null, block.id)} className="flex flex-col gap-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-        <div>
-          <label htmlFor={`t-${block.id}`} className="a-label">Section title</label>
-          <input id={`t-${block.id}`} name="title" defaultValue={block.title} placeholder={block.type === "text" ? "e.g. About NUPAL (optional)" : ""} className="a-input" />
+      {block.type === "hero" ? (
+        <input type="hidden" name="title" value="" />
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div>
+            <label htmlFor={`t-${block.id}`} className="a-label">Section title</label>
+            <input id={`t-${block.id}`} name="title" defaultValue={block.title} placeholder={block.type === "text" ? "e.g. About NUPAL (optional)" : ""} className="a-input" />
+          </div>
+          {block.anchor && <p className="a-help pb-3">Link to this section: <code>/{pageSlug}#{block.anchor}</code></p>}
         </div>
-        {block.anchor && <p className="a-help pb-3">Link to this section: <code>/{pageSlug}#{block.anchor}</code></p>}
-      </div>
+      )}
+
+      {block.type === "hero" && <HeroFields d={d as HeroData} />}
 
       {block.type === "intro" && <IntroFields d={d as IntroData} />}
       {block.type === "founder" && <FounderFields d={d as FounderData} />}
@@ -85,6 +91,43 @@ export function BlockEditor({ block, pageSlug }: { block: Block; pageSlug: strin
 
 const MD_HELP = "Leave a blank line between paragraphs. **bold**, - bullet points, [link text](https://…).";
 
+/** Our Story banner words. Empty fields fall back to the wording from the team's design. */
+function HeroFields({ d }: { d: HeroData }) {
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <div className="flex flex-col gap-3">
+        <div>
+          <label className="a-label">Small line above the headline</label>
+          <input name="eyebrow" defaultValue={d.eyebrow ?? ""} placeholder="Our story | Since 1960" className="a-input" />
+        </div>
+        <div>
+          <label className="a-label">Headline</label>
+          <textarea name="headline" rows={2} defaultValue={d.headline ?? ""} placeholder={"Six Decades of\nAyurveda from Kochi."} className="a-textarea" />
+          <p className="a-help">Each line is shown exactly as typed (press Enter for a new line). The last line is shown in cream. Two short lines look best.</p>
+        </div>
+        <div>
+          <label className="a-label">Text under the headline</label>
+          <textarea name="text" rows={3} defaultValue={d.text ?? ""} placeholder="From a research centre in Kochi to formulations trusted in homes and clinics…" className="a-textarea" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div><label className="a-label">First button</label><input name="cta1Label" defaultValue={d.cta1Label ?? ""} placeholder="Shop Bestsellers" className="a-input" /></div>
+          <div><label className="a-label">First button link</label><input name="cta1Href" defaultValue={d.cta1Href ?? ""} placeholder="#bestsellers" className="a-input" /></div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div><label className="a-label">Second button</label><input name="cta2Label" defaultValue={d.cta2Label ?? ""} placeholder="Book a Consultation" className="a-input" /></div>
+          <div><label className="a-label">Second button link</label><input name="cta2Href" defaultValue={d.cta2Href ?? ""} placeholder="/consult" className="a-input" /></div>
+        </div>
+        <p className="a-help">
+          Links: a page such as <code>/consult</code> or <code>/shop</code>, or <code>#bestsellers</code> for the products further down this page. Leave a button empty to hide it.
+          The founder photo and the Vaidyavachaspathy badge are edited in the Founder section.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function TextFields({ d }: { d: TextData }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
@@ -111,6 +154,11 @@ function MessageFields({ d }: { d: MessageData }) {
         <div><p className="a-label">Photo</p><ImageField name="photo" folder="pages" multiple={false} existing={d.photo ? [d.photo] : []} help="Portrait photo" /></div>
         <div><label className="a-label">Name</label><input name="name" defaultValue={d.name ?? ""} className="a-input" /></div>
         <div><label className="a-label">Role</label><input name="role" defaultValue={d.role ?? ""} placeholder="e.g. Chairman" className="a-input" /></div>
+        <div>
+          <label className="a-label">Short quote (optional)</label>
+          <textarea name="quote" rows={3} defaultValue={d.quote ?? ""} className="a-textarea" />
+          <p className="a-help">One or two lines shown on the Our Story page. The full message opens under “Read the full message”. Empty: the first sentence is used.</p>
+        </div>
       </div>
       <div>
         <label className="a-label">Message</label>
@@ -121,13 +169,13 @@ function MessageFields({ d }: { d: MessageData }) {
   );
 }
 
-type Row = { k: string; name: string; role?: string; qual?: string; bio?: string; url?: string; img?: string | null };
+type Row = { k: string; name: string; role?: string; qual?: string; focus?: string; bio?: string; url?: string; img?: string | null };
 
 function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | Logo)[] }) {
   const [rows, setRows] = useState<Row[]>(() =>
     initial.map((r) =>
       kind === "people"
-        ? { k: key(), name: r.name, role: (r as Person).role, qual: (r as Person).qual ?? "", bio: (r as Person).bio, img: (r as Person).photo ?? null }
+        ? { k: key(), name: r.name, role: (r as Person).role, qual: (r as Person).qual ?? "", focus: (r as Person).focus ?? "", bio: (r as Person).bio, img: (r as Person).photo ?? null }
         : { k: key(), name: r.name, url: (r as Logo).url, img: (r as Logo).image ?? null },
     ),
   );
@@ -156,7 +204,10 @@ function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | 
               )}
             </div>
             {kind === "people" && (
-              <div><label className="a-label">Qualifications (optional)</label><input name="row_qual" defaultValue={r.qual} placeholder="e.g. BAMS" className="a-input" /></div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div><label className="a-label">Qualifications (optional)</label><input name="row_qual" defaultValue={r.qual} placeholder="e.g. BAMS" className="a-input" /></div>
+                <div><label className="a-label">Looks after (optional)</label><input name="row_focus" defaultValue={r.focus} placeholder="e.g. Finance and purchase" className="a-input" /></div>
+              </div>
             )}
             {kind === "people" && (
               <div><label className="a-label">Short bio (optional)</label><textarea name="row_bio" rows={3} defaultValue={r.bio} className="a-textarea" /></div>
@@ -169,7 +220,7 @@ function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | 
           </div>
         </div>
       ))}
-      <button type="button" className="a-btn-ghost self-start" onClick={() => setRows((x) => [...x, { k: key(), name: "", role: "", qual: "", bio: "", url: "", img: null }])}>
+      <button type="button" className="a-btn-ghost self-start" onClick={() => setRows((x) => [...x, { k: key(), name: "", role: "", qual: "", focus: "", bio: "", url: "", img: null }])}>
         + Add {kind === "people" ? "person" : "logo"}
       </button>
     </div>

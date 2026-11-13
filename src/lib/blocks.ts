@@ -1,6 +1,7 @@
-export const BLOCK_TYPES = ["intro", "founder", "duo", "text", "stats", "timeline", "cards", "message", "people", "logos", "gallery"] as const;
+export const BLOCK_TYPES = ["hero", "intro", "founder", "duo", "text", "stats", "timeline", "cards", "message", "people", "logos", "gallery"] as const;
 
 export const BLOCK_LABELS: Record<string, { name: string; help: string }> = {
+  hero: { name: "Story banner", help: "The full-screen green banner at the top of Our Story: small line, headline, text and two buttons" },
   intro: { name: "Story opening", help: "Big headline, wide photo and intro — e.g. “Since 1965”" },
   founder: { name: "Founder", help: "Portrait inside NUPAL’s DNA illustration, with a quote and story" },
   duo: { name: "Two cards", help: "Two side-by-side cards — e.g. Vision and Mission" },
@@ -14,6 +15,8 @@ export const BLOCK_LABELS: Record<string, { name: string; help: string }> = {
   gallery: { name: "Gallery", help: "Photos that open full size — e.g. certificates, CSR" },
 };
 
+/** Our Story banner. `headline`: one line per row; the last row is shown in cream. */
+export type HeroData = { eyebrow?: string; headline?: string; text?: string; cta1Label?: string; cta1Href?: string; cta2Label?: string; cta2Href?: string };
 export type IntroData = { eyebrow?: string; image?: string | null; body?: string; name?: string; role?: string };
 export type FounderData = { eyebrow?: string; image?: string | null; quote?: string; body?: string; badge?: string; badgeSub?: string };
 export type DuoData = { eyebrow?: string; cards?: { title: string; text: string }[] };
@@ -24,8 +27,10 @@ export type Milestone = { year: string; title: string; text: string };
 export type TimelineData = { items?: Milestone[] };
 export type Card = { title: string; text: string };
 export type CardsData = { intro?: string; cards?: Card[] };
-export type MessageData = { photo?: string | null; name?: string; role?: string; body?: string };
-export type Person = { photo?: string | null; name: string; role: string; qual?: string; bio: string };
+/** `quote`: one short line shown on Our Story; the full message opens under "Read the full message". */
+export type MessageData = { photo?: string | null; name?: string; role?: string; quote?: string; body?: string };
+/** `focus`: one short line on what they look after, e.g. "Finance and purchase". */
+export type Person = { photo?: string | null; name: string; role: string; qual?: string; focus?: string; bio: string };
 export type Logo = { image?: string | null; name: string; url: string };
 export type PeopleData = { people?: Person[] };
 export type LogosData = { logos?: Logo[] };

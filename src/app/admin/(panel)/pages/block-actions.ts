@@ -7,7 +7,7 @@ import { slugify } from "@/lib/format";
 import { str } from "@/lib/form";
 import { BLOCK_TYPES } from "@/lib/blocks";
 
-const DEFAULT_TITLE: Record<string, string> = { founder: "Our story is written in our DNA", duo: "Vision & mission", intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
+const DEFAULT_TITLE: Record<string, string> = { hero: "", founder: "Our story is written in our DNA", duo: "Vision & mission", intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
 
 async function refresh(pageId: string) {
   const page = await db.page.findUnique({ where: { id: pageId }, select: { slug: true } });
@@ -46,7 +46,17 @@ export async function saveBlock(id: string, f: FormData) {
     const cols = names.map((n) => f.getAll(`row_${n}`).map(String));
     return cols[0].map((_, i) => Object.fromEntries(names.map((n, k) => [n, (cols[k][i] ?? "").trim()])));
   };
-  if (b.type === "intro") {
+  if (b.type === "hero") {
+    data = {
+      eyebrow: str(f, "eyebrow"),
+      headline: str(f, "headline"),
+      text: str(f, "text"),
+      cta1Label: str(f, "cta1Label"),
+      cta1Href: str(f, "cta1Href"),
+      cta2Label: str(f, "cta2Label"),
+      cta2Href: str(f, "cta2Href"),
+    };
+  } else if (b.type === "intro") {
     data = { eyebrow: str(f, "eyebrow"), image: keep(f, "image")[0] ?? null, body: str(f, "body"), name: str(f, "name"), role: str(f, "role") };
   } else if (b.type === "founder") {
     data = { eyebrow: str(f, "eyebrow"), image: keep(f, "image")[0] ?? null, quote: str(f, "quote"), body: str(f, "body"), badge: str(f, "badge"), badgeSub: str(f, "badgeSub") };
@@ -65,16 +75,17 @@ export async function saveBlock(id: string, f: FormData) {
   } else if (b.type === "text") {
     data = { body: str(f, "body"), image: keep(f, "image")[0] ?? null, imageSide: str(f, "imageSide") === "left" ? "left" : "right" };
   } else if (b.type === "message") {
-    data = { photo: keep(f, "photo")[0] ?? null, name: str(f, "name"), role: str(f, "role"), body: str(f, "body") };
+    data = { photo: keep(f, "photo")[0] ?? null, name: str(f, "name"), role: str(f, "role"), quote: str(f, "quote"), body: str(f, "body") };
   } else if (b.type === "people") {
     const keys = f.getAll("row_key").map(String);
     const names = f.getAll("row_name").map(String);
     const roles = f.getAll("row_role").map(String);
     const bios = f.getAll("row_bio").map(String);
     const quals = f.getAll("row_qual").map(String);
+    const focuses = f.getAll("row_focus").map(String);
     data = {
       people: keys
-        .map((k, i) => ({ name: names[i]?.trim() ?? "", role: roles[i]?.trim() ?? "", qual: quals[i]?.trim() ?? "", bio: bios[i]?.trim() ?? "", photo: keep(f, `row_${k}_img`)[0] ?? null }))
+        .map((k, i) => ({ name: names[i]?.trim() ?? "", role: roles[i]?.trim() ?? "", qual: quals[i]?.trim() ?? "", focus: focuses[i]?.trim() ?? "", bio: bios[i]?.trim() ?? "", photo: keep(f, `row_${k}_img`)[0] ?? null }))
         .filter((p) => p.name),
     };
   } else if (b.type === "logos") {

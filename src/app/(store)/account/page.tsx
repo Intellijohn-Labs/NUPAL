@@ -34,7 +34,7 @@ export default async function AccountPage() {
         {[
           ["My cart", "/cart"],
           ["Book a consultation", "/consult"],
-          ["About Nupal", "/about-us"],
+          ["Our Story", "/our-story"],
           ...pages.map((p) => [p.title, `/${p.slug}`]),
         ].map(([label, href]) => (
           <li key={href}>

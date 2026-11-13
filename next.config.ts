@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     ],
   },
   eslint: { ignoreDuringBuilds: true },
+  // The About page is now "Our Story" (team direction, Nov 2026). Old links keep working.
+  async redirects() {
+    return [{ source: "/about-us", destination: "/our-story", permanent: true }];
+  },
   experimental: {
     serverActions: { bodySizeLimit: "8mb" },
   },
