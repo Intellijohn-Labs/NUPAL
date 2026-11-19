@@ -237,16 +237,20 @@ export default async function ProductPage({ params, searchParams }: { params: P;
             />
 
             {p.benefits.length > 0 && (
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-4 rounded-2xl bg-[#EAF2E7] p-4 sm:p-5">
+              // Benefits: one per row, or two equal tiles per row once the box itself is wide enough (container query,
+              // so it follows the buy column's width rather than the screen's). Icon sits beside the first line.
+              <div className="@container">
+              <ul className="grid grid-cols-1 gap-2.5 rounded-2xl bg-[#EAF2E7] p-3 @[36rem]:grid-cols-2 @[36rem]:p-4">
                 {p.benefits.slice(0, 4).map((b, i) => (
-                  <li key={b} className="flex items-center gap-3 text-[14px] font-medium leading-snug text-[#22302A]">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-[#174D36] shadow-sm">
-                      <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{BENEFIT_ICONS[i % BENEFIT_ICONS.length]}</svg>
+                  <li key={b} className="flex items-start gap-3 rounded-xl bg-white/70 p-3 text-[14.5px] leading-[1.45] text-[#22302A]">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-[#174D36] shadow-[0_1px_3px_rgba(23,77,54,.12)]">
+                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{BENEFIT_ICONS[i % BENEFIT_ICONS.length]}</svg>
                     </span>
-                    {b}
+                    <span className="min-w-0 self-center">{b.trim().replace(/\.+$/, "")}</span>
                   </li>
                 ))}
               </ul>
+              </div>
             )}
 
             <ProductTabs tabs={tabs} />
