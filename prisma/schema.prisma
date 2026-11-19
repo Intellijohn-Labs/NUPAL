@@ -58,6 +58,7 @@ model Product {
   benefits     String[]           @default([])
   faqs         Json               @default("[]") // [{ q, a }]
   images       String[]           @default([]) // URLs, first is the cover
+  storyImages  String[]           @default([]) // full-width banners shown under the product (top to bottom)
   videoUrl     String?
   isActive     Boolean            @default(true)
   isBestseller Boolean            @default(false)

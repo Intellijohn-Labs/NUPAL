@@ -38,9 +38,9 @@ export function ProductGallery({ images, name, type, videoUrl }: { images: strin
               aria-label={`Show image ${k + 1}`}
               aria-pressed={k === i}
               onClick={() => setI(k)}
-              className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 ${k === i ? "border-sage" : "border-transparent"}`}
+              className={`relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-xl border-2 bg-[#F1F5EE] transition-colors sm:h-20 sm:w-20 ${k === i ? "border-[#174D36]" : "border-[#E3E8E0] hover:border-[#9DBA94]"}`}
             >
-              <Image src={src} alt="" fill sizes="80px" className="bg-white object-contain p-1" />
+              <Image src={src} alt="" fill sizes="80px" className="object-contain p-1" />
             </button>
           ))}
           {video && (
@@ -58,7 +58,7 @@ export function ProductGallery({ images, name, type, videoUrl }: { images: strin
         </div>
       )}
 
-      <div className="relative flex aspect-square flex-1 items-center justify-center overflow-hidden rounded-3xl bg-white">
+      <div className="relative flex aspect-square flex-1 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#F6F9F3_0%,#E3EDDF_100%)]">
         {isVideo || (!images.length && video && slots === 1) ? (
           <button type="button" onClick={openVideo} aria-label={`Play ${name} video`} className="group absolute inset-0 flex items-center justify-center bg-forest">
             {videoThumb && <img src={videoThumb} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />}
@@ -67,7 +67,7 @@ export function ProductGallery({ images, name, type, videoUrl }: { images: strin
             <span className="absolute bottom-4 left-4 rounded-full bg-white/95 px-3 py-1 text-sm font-medium text-forest">Watch video</span>
           </button>
         ) : images[i] ? (
-          <Image src={images[i]} alt={name} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="bg-white object-contain p-6" />
+          <Image src={images[i]} alt={name} fill priority sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain p-6 sm:p-8" />
         ) : (
           <ProductArt name={name} type={type} size={200} />
         )}

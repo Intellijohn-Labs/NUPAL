@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { slugify } from "@/lib/format";
 import { bool, collectImages, int, list, optStr, str } from "@/lib/form";
 import { parseVideo } from "@/lib/video";
+import { MAX_PHOTOS, MAX_STORY_IMAGES } from "@/lib/product-limits";
 
 export async function saveProduct(id: string | null, _prev: string | null, f: FormData): Promise<string | null> {
   await requireArea("products");
@@ -51,6 +52,10 @@ export async function saveProduct(id: string | null, _prev: string | null, f: Fo
   if (videoUrl && !parseVideo(videoUrl)) return "The video link should be a YouTube link (video or Short) or a link to an .mp4 file.";
   const images = await collectImages(f, "images", "products").catch((e: Error) => e);
   if (images instanceof Error) return images.message;
+  if (images.length > MAX_PHOTOS) return `A product can have up to ${MAX_PHOTOS} photos. Remove ${images.length - MAX_PHOTOS} to save.`;
+  const storyImages = await collectImages(f, "storyImages", "products").catch((e: Error) => e);
+  if (storyImages instanceof Error) return storyImages.message;
+  if (storyImages.length > MAX_STORY_IMAGES) return `A product can have up to ${MAX_STORY_IMAGES} story images. Remove ${storyImages.length - MAX_STORY_IMAGES} to save.`;
 
   const data = {
     name,
@@ -64,6 +69,7 @@ export async function saveProduct(id: string | null, _prev: string | null, f: Fo
     benefits: list(f, "benefits"),
     faqs,
     images,
+    storyImages,
     videoUrl,
     isActive: bool(f, "isActive"),
     isBestseller: bool(f, "isBestseller"),

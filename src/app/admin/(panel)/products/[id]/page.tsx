@@ -44,6 +44,7 @@ export default async function EditProduct({ params, searchParams }: { params: Pr
           benefits: p.benefits,
           faqs: (Array.isArray(p.faqs) ? p.faqs : []) as { q: string; a: string }[],
           images: p.images,
+          storyImages: p.storyImages,
           videoUrl: p.videoUrl ?? "",
           isActive: p.isActive,
           isBestseller: p.isBestseller,

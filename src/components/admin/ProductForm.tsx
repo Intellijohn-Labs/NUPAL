@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { saveProduct } from "@/app/admin/(panel)/products/actions";
 import { ImageField } from "./ImageField";
 import { SubmitButton } from "./ui";
+import { MAX_PHOTOS, MAX_STORY_IMAGES } from "@/lib/product-limits";
 
 type V = { id: string; label: string; mrp: number | ""; price: number | ""; stock: number | ""; sku: string };
 type Product = {
@@ -19,6 +20,7 @@ type Product = {
   benefits: string[];
   faqs: { q: string; a: string }[];
   images: string[];
+  storyImages: string[];
   videoUrl: string;
   isActive: boolean;
   isBestseller: boolean;
@@ -130,12 +132,24 @@ export function ProductForm({ product, concerns, types }: { product?: Product; c
 
         <section className="a-card flex flex-col gap-3">
           <h2 className="font-sans text-lg font-semibold">Photos</h2>
-          <ImageField name="images" folder="products" square maxSide={1200} existing={product?.images} help="Any shape works. Photos are made square automatically: white borders are trimmed, and full photos are cropped to the centre. Keep the product in the middle of the photo. First photo is the cover." />
+          <ImageField name="images" folder="products" square maxSide={1200} max={MAX_PHOTOS} existing={product?.images} help="Up to 6 photos. Any shape works. Photos are made square automatically: white borders are trimmed, and full photos are cropped to the centre. Keep the product in the middle of the photo. First photo is the cover." />
           <div>
             <label htmlFor="videoUrl" className="a-label">Video link (optional)</label>
             <input id="videoUrl" name="videoUrl" type="url" defaultValue={product?.videoUrl} placeholder="https://www.youtube.com/watch?v=…" className="a-input" />
             <p className="a-help">Shown as the last item in the product’s photos, with a play button. Unlisted YouTube videos work.</p>
           </div>
+        </section>
+
+        <section className="a-card flex flex-col gap-3">
+          <h2 className="font-sans text-lg font-semibold">Story images (optional)</h2>
+          <ImageField
+            name="storyImages"
+            folder="products"
+            maxSide={2200}
+            max={MAX_STORY_IMAGES}
+            existing={product?.storyImages}
+            help="Up to 3 wide banners, shown one after another under the product, full width (for example: how it works, key ingredients, how to use, results). About 2200 × 930 px (wide) works best on computers and phones. Put the writing inside the picture, large enough to read on a phone. Shown in this order."
+          />
         </section>
 
         <section className="a-card flex flex-col gap-3">

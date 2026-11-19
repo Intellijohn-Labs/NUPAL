@@ -16,6 +16,7 @@ export function ImageField({
   maxSide = 1600,
   square = false,
   trimBars = false,
+  max,
 }: {
   name?: string;
   existing?: string[];
@@ -27,6 +28,8 @@ export function ImageField({
   square?: boolean;
   /** Cut off plain black/white bars at the edges (banners). */
   trimBars?: boolean;
+  /** Most images allowed (multiple only). Picking more uploads only the first ones that fit. */
+  max?: number;
 }) {
   const [kept, setKept] = useState(existing);
   const [busy, setBusy] = useState(0);
@@ -49,16 +52,27 @@ export function ImageField({
   }, [busy]);
 
   async function onPick(list: FileList | null) {
-    const files = Array.from(list ?? []).filter((f) => f.type.startsWith("image/"));
+    let files = Array.from(list ?? []).filter((f) => f.type.startsWith("image/"));
     if (!files.length) return;
     setError("");
+    if (multiple && max) {
+      const room = max - kept.length - busy;
+      if (room <= 0) {
+        setError(`You can add up to ${max} images. Remove one to add another.`);
+        return;
+      }
+      if (files.length > room) {
+        files = files.slice(0, room);
+        setError(`You can add up to ${max} images, so only the first ${room} ${room === 1 ? "was" : "were"} added.`);
+      }
+    }
     setBusy((n) => n + files.length);
     const res = await uploadFiles(multiple ? files : files.slice(0, 1), folder, undefined, { maxSide, square, trimBars });
     setBusy((n) => Math.max(0, n - files.length));
     const urls = res.filter((r) => r.url).map((r) => r.url!);
     const failed = res.filter((r) => r.status === "failed");
     if (failed.length) setError(failed[0].error || "Some photos couldn’t be uploaded.");
-    setKept((k) => (multiple ? [...k, ...urls] : urls.length ? [urls[0]] : k));
+    setKept((k) => (multiple ? [...k, ...urls].slice(0, max ?? Infinity) : urls.length ? [urls[0]] : k));
   }
 
   const move = (i: number, d: number) =>
@@ -69,6 +83,8 @@ export function ImageField({
       [n[i], n[j]] = [n[j], n[i]];
       return n;
     });
+
+  const full = multiple && !!max && kept.length + busy >= max;
 
   return (
     <div ref={ref} className="flex flex-col gap-3">
@@ -94,13 +110,26 @@ export function ImageField({
           ))}
         </ul>
       )}
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-[#b9c6be] bg-[#fafcfb] px-4 py-6 text-center text-sm hover:border-[#2e6b47]">
-        <span className="font-semibold text-[#2e6b47]">{busy ? `Uploading ${busy}…` : multiple ? "Choose images to upload" : kept.length ? "Replace image" : "Choose an image"}</span>
+      <label className={`flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed px-4 py-6 text-center text-sm ${full ? "cursor-not-allowed border-[#dce5df] bg-[#f4f6f5]" : "cursor-pointer border-[#b9c6be] bg-[#fafcfb] hover:border-[#2e6b47]"}`}>
+        <span className={`font-semibold ${full ? "text-[#56685d]" : "text-[#2e6b47]"}`}>
+          {busy
+            ? `Uploading ${busy}…`
+            : full
+              ? `Limit reached: ${max} of ${max}. Remove one to add another.`
+              : multiple
+                ? max
+                  ? `Choose images to upload (${kept.length} of ${max})`
+                  : "Choose images to upload"
+                : kept.length
+                  ? "Replace image"
+                  : "Choose an image"}
+        </span>
         <span className="text-[#56685d]">{help ?? "JPG, PNG or WebP. Large photos are shrunk automatically."}</span>
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
           multiple={multiple}
+          disabled={full}
           className="sr-only"
           onChange={(e) => {
             onPick(e.target.files);
