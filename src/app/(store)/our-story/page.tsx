@@ -11,6 +11,7 @@ import { CountUp } from "@/components/store/CountUp";
 import { Reveal } from "@/components/store/Reveal";
 import { FinalCta } from "@/components/store/FinalCta";
 import { CertStrip, type Cert } from "@/components/store/CertStrip";
+import { PersonModal } from "@/components/store/PersonModal";
 import localFont from "next/font/local";
 
 // The story banner uses the team mockup's type: Lora for the headline, Poppins for the words and buttons.
@@ -244,12 +245,11 @@ export default async function OurStoryPage() {
   const vision = duo[0] ?? { title: "Our Vision", text: "To make authentic Ayurveda available to everyone, joining time-tested knowledge with modern technology." };
   const mission = duo[1] ?? { title: "Our Mission", text: "To carry Ayurveda’s life-sustaining benefits to more people, through a trusted range, a research team and certified manufacturing." };
 
-  // Team: everyone in the People block except the chairman (shown above them) and the doctors (their own section).
+  // Team: everyone in the People block except the chairman (shown above them), in the order set in admin.
   const chairKey = chairman.name ? nameKey(chairman.name) : "";
-  const doctorKeys = doctors.map((d) => nameKey(d.name));
-  const isDoctor = (n: string) => /^dr\b/i.test(n.trim()) || doctorKeys.some((k) => k && nameKey(n).includes(k));
-  const team = people.filter((p) => nameKey(p.name) !== chairKey && !isDoctor(p.name));
-  const chairmanRole = people.find((p) => chairKey && nameKey(p.name) === chairKey)?.role || chairman.role || "Chairman";
+  const team = people.filter((p) => nameKey(p.name) !== chairKey);
+  const chairPerson = people.find((p) => chairKey && nameKey(p.name) === chairKey);
+  const chairmanRole = chairPerson?.role || chairman.role || "Chairman";
   const chairQuote = chairman.quote?.trim() || strip(paras(chairman.body)[0] ?? "").split(/(?<=\.)\s/)[0];
   const doctorRole = (name: string) => people.find((p) => nameKey(p.name).includes(nameKey(name)))?.role.replace(/^\(([^)]*)\),?\s*/, "$1, ") ?? "";
 
@@ -618,7 +618,10 @@ export default async function OurStoryPage() {
                     <Eyebrow>Chairman’s message</Eyebrow>
                     {chairQuote && <blockquote className="m-0 mt-3 font-display text-[clamp(19px,2vw,25px)] italic leading-snug text-[#174D36]">“{chairQuote.replace(/^[“"]|[”"]$/g, "")}”</blockquote>}
                     <figcaption className="mt-4">
-                      <span className="block font-semibold text-[#174D36]">{chairman.name}</span>
+                      <span className="block font-semibold text-[#174D36]">
+                        {chairman.name}
+                        {chairPerson?.qual && <span className="font-medium text-[#B08A2E]">, {chairPerson.qual}</span>}
+                      </span>
                       <span className="text-[14px] text-[#5e6862]">{chairmanRole.replace(/\bMD\b/, "Managing Director").replace(/^CHAIRMAN/, "Chairman")}</span>
                     </figcaption>
                     {chairman.body?.trim() && (
@@ -631,36 +634,49 @@ export default async function OurStoryPage() {
                         <div className="prose-nupal mt-2 text-[15.5px] leading-7 text-[#343B35]"><ReactMarkdown>{chairman.body}</ReactMarkdown></div>
                       </details>
                     )}
+                    {chairPerson?.bio?.trim() && (
+                      <details className="group text-left">
+                        <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-1.5 font-medium text-[#397C42] [&::-webkit-details-marker]:hidden">
+                          <span className="group-open:hidden">About {chairman.name}</span>
+                          <span className="hidden group-open:inline">Show less</span>
+                          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 6l5 5 5-5" /></svg>
+                        </summary>
+                        <p className="mt-2 whitespace-pre-line text-[15.5px] leading-7 text-[#343B35]">{chairPerson.bio}</p>
+                      </details>
+                    )}
                   </div>
                 </figure>
               </Reveal>
             )}
 
             {team.length > 0 && (
-              <ul className="mt-6 grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 lg:grid-cols-4">
+              <ul className="mx-auto mt-8 flex max-w-[920px] flex-wrap justify-center gap-4 sm:gap-5">
                 {team.map((p, i) => (
-                  <li key={p.name + i}>
+                  <li key={p.name + i} className="w-[calc(50%-8px)] sm:w-[calc(33.333%-14px)]">
                     <Reveal index={i % 4} className="h-full">
-                      <div className="flex h-full flex-col items-center rounded-[20px] bg-white px-4 py-6 text-center">
-                        <span className="block h-24 w-24 overflow-hidden rounded-full bg-[linear-gradient(180deg,#F2F6EF,#DCE8D6)]">
+                      <div className="flex h-full flex-col items-center rounded-[22px] bg-white p-2.5 pb-4 text-center shadow-[0_20px_40px_-32px_rgba(23,77,54,.6)] sm:p-3 sm:pb-5">
+                        <span className="block aspect-[12/13] w-full overflow-hidden rounded-[16px] bg-[linear-gradient(180deg,#2E7D4F,#123D2A)]">
                           {p.photo ? (
                             <img src={p.photo} alt={p.name} loading="lazy" className="h-full w-full object-cover object-top" />
                           ) : (
-                            <span className="grid h-full place-items-center font-display text-3xl text-[#174D36]">{nameKey(p.name).split(" ").filter(Boolean).map((w, k, a) => (k === 0 || k === a.length - 1 ? w[0] : "")).join("").toUpperCase()}</span>
+                            <span className="grid h-full place-items-center font-display text-4xl text-white/90">{nameKey(p.name).split(" ").filter(Boolean).map((w, k, a) => (k === 0 || k === a.length - 1 ? w[0] : "")).join("").toUpperCase()}</span>
                           )}
                         </span>
-                        <p className="mt-3 font-semibold leading-snug text-[#174D36]">{p.name}</p>
-                        {p.role && <p className="mt-0.5 text-[13px] text-[#397C42]">{p.role}</p>}
+                        <p className="mt-3.5 px-1 font-semibold leading-snug text-[#174D36]">{p.name}</p>
+                        {p.qual && <p className="mt-0.5 text-[13px] font-medium text-[#B08A2E]">{p.qual}</p>}
+                        {p.role && <p className="mt-1.5 px-1 text-[13px] leading-5 text-[#397C42]">{p.role}</p>}
                         {p.focus && <p className="mt-2 text-[13.5px] leading-5 text-[#5e6862]">{p.focus}</p>}
-                        {p.bio && (
-                          <details className="group mt-auto w-full pt-2 text-left">
-                            <summary className="mx-auto flex min-h-11 w-max cursor-pointer list-none items-center gap-1 text-[13.5px] font-medium text-[#397C42] [&::-webkit-details-marker]:hidden">
-                              <span className="group-open:hidden">Read more</span>
-                              <span className="hidden group-open:inline">Show less</span>
-                              <Arrow />
-                            </summary>
-                            <p className="mt-1 whitespace-pre-line text-[14px] leading-6 text-[#343B35]">{p.bio}</p>
-                          </details>
+                        {p.bio?.trim() && (
+                          <PersonModal
+                            person={{
+                              name: p.name,
+                              qual: p.qual,
+                              role: p.role,
+                              bio: p.bio,
+                              photo: p.photo,
+                              initials: nameKey(p.name).split(" ").filter(Boolean).map((w, k, a) => (k === 0 || k === a.length - 1 ? w[0] : "")).join("").toUpperCase(),
+                            }}
+                          />
                         )}
                       </div>
                     </Reveal>

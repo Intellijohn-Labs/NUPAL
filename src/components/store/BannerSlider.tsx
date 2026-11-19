@@ -138,7 +138,7 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
             type="button"
             onClick={() => go(dir)}
             aria-label={dir < 0 ? "Previous banner" : "Next banner"}
-            className={`absolute top-1/2 z-10 hidden h-14 w-10 -translate-y-1/2 place-items-center transition-[opacity,transform] md:grid ${dir < 0 ? "left-2 hover:-translate-x-0.5 lg:left-4" : "right-2 hover:translate-x-0.5 lg:right-4"} ${b.imageDesktop ? "text-white opacity-80 drop-shadow-[0_2px_6px_rgba(0,0,0,.55)] hover:opacity-100" : "text-[#174D36] opacity-70 hover:opacity-100"}`}
+            className={`absolute top-1/2 z-10 hidden h-14 w-10 -translate-y-1/2 place-items-center transition-[opacity,transform] wide:grid ${dir < 0 ? "left-2 hover:-translate-x-0.5 lg:left-4" : "right-2 hover:translate-x-0.5 lg:right-4"} ${b.imageDesktop ? "text-white opacity-80 drop-shadow-[0_2px_6px_rgba(0,0,0,.55)] hover:opacity-100" : "text-[#174D36] opacity-70 hover:opacity-100"}`}
           >
             <svg width="22" height="40" viewBox="0 0 22 40" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d={dir < 0 ? "M18 3L4 20l14 17" : "M4 3l14 17L4 37"} />
@@ -157,41 +157,45 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
       </div>
     ) : null;
 
-  // Photo banner: the picture fills the screen edge to edge.
-  // With text: on desktop the writing sits on the photo's open left side; on phones the whole 9:16 phone image
-  // is shown, with the writing in its open top area and the button and trust points over its bottom edge,
-  // so the packs in the middle of the picture stay clear. Dots sit on a panel below (colour from "Background colour").
+  // Photo banner. The layout follows the screen's shape, so the products in the picture are never covered or cut off:
+  //  · phones (narrow, upright): the whole 9:16 phone image, writing in its open top area, button and trust points
+  //    over its bottom edge;
+  //  · upright tablets ("tall:"): the whole wide image on top, writing on a panel underneath;
+  //  · landscape screens ("wide:", tablets on their side, laptops, PCs): the wide image fills the banner, which is as
+  //    tall as the picture (2:1) but never taller than the screen, with the writing on its open left side.
   // Without a small line or supporting text (writing already in the picture), the whole banner is one link.
+  // Panel and dots colour come from "Background colour".
   if (b.imageDesktop) {
     const hasText = Boolean(b.eyebrow.trim() || b.subtitle.trim());
     const panel = PANELS[b.theme] ?? PANELS.green;
+    // landscape: banner height = the picture's shape (half the width), at most the screen under the header (and phone bar below lg)
+    const wideHeight = "wide:min-h-[min(50vw,calc(100svh-164px))] wide:lg:min-h-[min(50vw,calc(100svh-112px))]";
     return (
       <section aria-roledescription="carousel" aria-label="Featured" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} className="relative overflow-hidden" style={{ background: panel }}>
         {!hasText ? (
-          <Link key={b.id} href={b.ctaHref} aria-label={b.ctaLabel || "View offer"} className="fade-in relative block h-[calc(100svh-100px-64px)] min-h-[520px] md:h-[calc(100svh-100px)] lg:h-[calc(100svh-112px)] md:min-h-[560px]">
-            {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover md:hidden" sizes="100vw" />}
-            <Image src={b.imageDesktop} alt="" fill priority className={`object-cover ${b.imageMobile ? "hidden md:block" : ""}`} sizes="100vw" />
+          <Link key={b.id} href={b.ctaHref} aria-label={b.ctaLabel || "View offer"} className={`fade-in relative block h-[calc(100svh-100px-64px)] min-h-[520px] tall:aspect-[2/1] tall:h-auto tall:min-h-0 wide:h-auto ${wideHeight}`}>
+            {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover tall:hidden wide:hidden" sizes="100vw" />}
+            <Image src={b.imageDesktop} alt="" fill priority className={`object-cover ${b.imageMobile ? "hidden tall:block wide:block" : ""}`} sizes="100vw" />
           </Link>
         ) : (
-          <div key={b.id} className="fade-in relative md:h-[calc(100svh-100px)] lg:h-[calc(100svh-112px)] md:min-h-[560px]">
-            {/* photo.
-                Phones: the whole phone image (9:16) is shown uncropped. Its designer leaves the top third empty for the
-                writing and keeps the packs in the lower middle, so the writing at the top and the button at the bottom
-                never cover the packs, on any screen size. Desktop: the wide image fills the banner. */}
-            <div className="relative aspect-[9/16] w-full md:absolute md:inset-0 md:aspect-auto">
-              {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover md:hidden" sizes="(max-width: 767px) 100vw, 1px" />}
-              <Image src={b.imageDesktop} alt="" fill priority className={`object-cover object-right ${b.imageMobile ? "hidden md:block" : ""}`} sizes="100vw" />
+          <div key={b.id} className={`fade-in relative wide:flex ${wideHeight}`}>
+            {/* photo: phones show the whole 9:16 phone image; upright tablets the whole wide image; landscape fills the banner */}
+            <div className="relative aspect-[9/16] w-full tall:aspect-[2/1] wide:absolute wide:inset-0 wide:aspect-auto">
+              {b.imageMobile && <Image src={b.imageMobile} alt="" fill priority className="object-cover tall:hidden wide:hidden" sizes="(max-width: 499px) 100vw, 1px" />}
+              <Image src={b.imageDesktop} alt="" fill priority className={`object-cover object-right ${b.imageMobile ? "hidden tall:block wide:block" : ""}`} sizes="100vw" />
               {/* phones: light shade at the top for the writing and at the bottom for the button; the middle stays clear */}
-              <div className="absolute inset-x-0 top-0 h-[46%] md:hidden" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,.22) 45%, rgba(0,0,0,0) 100%)" }} />
-              <div className="absolute inset-x-0 bottom-0 h-[30%] md:hidden" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.7) 100%)" }} />
-              {/* desktop: soft shade on the left so the writing reads clearly */}
-              <div className="absolute inset-0 hidden md:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.38) 36%, rgba(0,0,0,0) 62%)" }} />
+              <div className="absolute inset-x-0 top-0 h-[46%] tall:hidden wide:hidden" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,.22) 45%, rgba(0,0,0,0) 100%)" }} />
+              <div className="absolute inset-x-0 bottom-0 h-[30%] tall:hidden wide:hidden" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.7) 100%)" }} />
+              {/* upright tablets: the picture fades into the panel underneath */}
+              <div className="absolute inset-x-0 bottom-0 hidden h-[22%] tall:block" style={{ background: `linear-gradient(to bottom, transparent, ${panel})` }} />
+              {/* landscape: soft shade on the left so the writing reads clearly */}
+              <div className="absolute inset-0 hidden wide:block" style={{ background: "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.38) 36%, rgba(0,0,0,0) 62%)" }} />
               {/* phones: the writing, centred in the image's open top area.
                   The phone images keep roughly their top 40% free of products, so the three parts (small line,
                   headline, description) are spread over the whole top 41%, whatever the length of the description.
                   Sizes are in vw, like the image, so the layout is the same on every phone; the small line and each
                   headline line are sized to fit on one row (see phoneFit). */}
-              <div className="absolute inset-x-0 top-0 flex h-[41%] flex-col items-center justify-between px-[6%] pb-[1%] pt-[8%] text-center text-white md:hidden">
+              <div className="absolute inset-x-0 top-0 flex h-[41%] flex-col items-center justify-between px-[6%] pb-[1%] pt-[8%] text-center text-white tall:hidden wide:hidden">
                 {b.eyebrow && (
                   <p className="hero-in flex max-w-full items-center gap-[2.5vw] whitespace-nowrap font-medium uppercase tracking-[.2em] text-[#E7C88F] [text-shadow:0_1px_8px_rgba(0,0,0,.5)]" style={{ fontSize: `max(9px, ${phoneFit(b.eyebrow.trim().length, 3, 80)}vw)` }}>
                     <span aria-hidden="true" className="h-px w-[5vw] shrink-0 bg-gradient-to-r from-transparent to-[#E7C88F]" />
@@ -215,24 +219,25 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
                 )}
               </div>
             </div>
-            {/* writing — desktop: all of it on the photo's left; phones: the button and trust points over the bottom of the image */}
-            <div className="container-x absolute inset-x-0 bottom-0 flex flex-col items-center pb-[6%] text-center text-white md:relative md:h-full md:justify-center md:items-start md:pb-16 md:text-left lg:px-16">
-              <div className="flex w-full flex-col items-center md:max-w-[min(760px,58%)] md:items-start">
-                {b.eyebrow && <p className="hero-in hidden text-[13px] font-medium uppercase tracking-[.14em] text-[#E7C88F] [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_14px_rgba(0,0,0,.5)] md:block">{b.eyebrow}</p>}
-                <h1 className="hero-in mt-3 hidden text-[clamp(28px,3.7vw,60px)] leading-[1.1] [text-shadow:0_2px_4px_rgba(0,0,0,.45),0_4px_28px_rgba(0,0,0,.55)] md:block md:[&>span]:whitespace-nowrap" style={{ animationDelay: ".06s" }}>
+            {/* writing — phones: the button and trust points over the bottom of the image;
+                upright tablets: all of it centred on the panel under the image; landscape: all of it on the photo's left */}
+            <div className="container-x absolute inset-x-0 bottom-0 flex flex-col items-center pb-[6%] text-center text-white tall:relative tall:pb-8 tall:pt-1 wide:relative wide:w-full wide:items-start wide:justify-center wide:py-12 wide:text-left wide:short:py-6 lg:px-16">
+              <div className="flex w-full flex-col items-center tall:max-w-[640px] wide:max-w-[min(760px,58%)] wide:items-start">
+                {b.eyebrow && <p className="hero-in hidden text-[13px] font-medium uppercase tracking-[.14em] text-[#E7C88F] [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_14px_rgba(0,0,0,.5)] tall:block wide:block">{b.eyebrow}</p>}
+                <h1 className="hero-in mt-3 hidden text-[clamp(30px,5.4vw,52px)] leading-[1.1] [text-shadow:0_2px_4px_rgba(0,0,0,.45),0_4px_28px_rgba(0,0,0,.55)] tall:block wide:block wide:text-[clamp(26px,3.7vw,60px)] [&>span]:whitespace-nowrap" style={{ animationDelay: ".06s" }}>
                   {head.map((l, k) => <span key={k} className="block">{l}</span>)}
                   {last && <span className="block text-[#E7C88F]">{last}</span>}
                 </h1>
-                {b.subtitle && <p className="hero-in mt-5 hidden max-w-[480px] text-lg leading-8 text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_16px_rgba(0,0,0,.55)] md:block" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>}
+                {b.subtitle && <p className="hero-in mt-4 hidden max-w-[520px] text-[17px] leading-7 text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.6),0_2px_16px_rgba(0,0,0,.55)] tall:block wide:mt-5 wide:block wide:max-w-[480px] wide:text-lg wide:leading-8 wide:short:hidden" style={{ animationDelay: ".12s" }}>{b.subtitle}</p>}
                 {b.ctaLabel && (
-                  <Link href={b.ctaHref} className="hero-in inline-flex h-[52px] w-full items-center justify-center rounded-lg bg-white px-10 text-base font-medium text-[#174D36] transition-colors hover:bg-[#F4EBD2] md:mt-8 md:h-14 md:w-auto" style={{ animationDelay: ".18s" }}>
+                  <Link href={b.ctaHref} className="hero-in inline-flex h-[52px] w-full items-center justify-center rounded-lg bg-white px-10 text-base font-medium text-[#174D36] transition-colors hover:bg-[#F4EBD2] tall:mt-7 tall:h-14 tall:w-auto wide:mt-8 wide:h-14 wide:w-auto wide:short:mt-5" style={{ animationDelay: ".18s" }}>
                     {b.ctaLabel}
                   </Link>
                 )}
                 {chips.length > 0 && (
-                  <ul className="hero-in mt-4 flex w-full justify-between gap-1 md:mt-7 md:w-auto md:justify-start md:gap-5" style={{ animationDelay: ".24s" }}>
+                  <ul className="hero-in mt-4 flex w-full justify-between gap-1 tall:mt-6 tall:w-auto tall:justify-center tall:gap-6 wide:mt-7 wide:w-auto wide:justify-start wide:gap-5 wide:short:mt-4" style={{ animationDelay: ".24s" }}>
                     {chips.map((x) => (
-                      <li key={x} className="flex items-center gap-1 whitespace-nowrap text-[11px] text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.65)] md:gap-1.5 md:text-sm">
+                      <li key={x} className="flex items-center gap-1 whitespace-nowrap text-[11px] text-white/95 [text-shadow:0_1px_3px_rgba(0,0,0,.65)] tall:gap-1.5 tall:text-sm wide:gap-1.5 wide:text-sm">
                         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0 text-[#E7C88F]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" /></svg>
                         {x}
                       </li>
@@ -244,8 +249,8 @@ export function BannerSlider({ banners, products = [], trust = [] }: { banners: 
           </div>
         )}
         {arrows}
-        {dots && <div className="absolute bottom-5 right-6 z-10 hidden md:block lg:right-10">{dots}</div>}
-        {dots && <div className="flex justify-center pb-4 md:hidden">{dots}</div>}
+        {dots && <div className="absolute bottom-5 right-6 z-10 hidden wide:block lg:right-10">{dots}</div>}
+        {dots && <div className="flex justify-center pb-4 wide:hidden">{dots}</div>}
       </section>
     );
   }

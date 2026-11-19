@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Screen shape, used by the hero banner: "tall" = upright tablets, "wide" = landscape tablets, laptops and PCs
+   (phones, narrower than 500px, use neither), "short" = landscape screens with little height (phones on their side). */
+@custom-variant tall (@media (min-width: 500px) and (orientation: portrait));
+@custom-variant wide (@media (min-width: 500px) and (orientation: landscape));
+@custom-variant short (@media (max-height: 540px));
+
 /* NUPAL design tokens.
    Header, hero banner and footer: NUPAL’s deep forest green with gold.
    Between them: a warm ivory page with soft pastel bands and brick-red buttons (inspired by vedix.com). */
