@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { saveBlock } from "@/app/admin/(panel)/pages/block-actions";
-import { BLOCK_LABELS, type DuoData, type HeroData, type FounderData, type CardsData, type GalleryData, type IntroData, type Logo, type LogosData, type MessageData, type PeopleData, type Person, type StatsData, type TextData, type TimelineData } from "@/lib/blocks";
+import { BLOCK_LABELS, type DuoData, type HeroData, type FounderData, type CardsData, type GalleryData, type IntroData, type Logo, type LogosData, type MessageData, type PeopleData, type Person, type StatsData, type TextData, type TimelineData, type UnitData, type CertsData } from "@/lib/blocks";
 import { ImageField } from "./ImageField";
+import { VideoField } from "./VideoField";
+import { PdfField } from "./PdfField";
 import { SubmitButton } from "./ui";
 
 type Block = { id: string; type: string; title: string; anchor: string; data: unknown };
@@ -82,6 +84,13 @@ export function BlockEditor({ block, pageSlug }: { block: Block; pageSlug: strin
         <div>
           <p className="a-label">Photos</p>
           <ImageField name="images" folder="pages" maxSide={2000} existing={(d as GalleryData).images ?? []} help="Certificates or event photos. Visitors can tap to see them full size." />
+        </div>
+      )}
+      {block.type === "unit" && <UnitFields d={d as UnitData} />}
+      {block.type === "certs" && (
+        <div>
+          <p className="a-label">Certificates PDF</p>
+          <PdfField name="pdf" initial={(d as CertsData).pdf ?? ""} />
         </div>
       )}
       <div><SubmitButton>Save {label.toLowerCase()} section</SubmitButton></div>
@@ -171,7 +180,7 @@ function MessageFields({ d }: { d: MessageData }) {
 
 type Row = { k: string; name: string; role?: string; qual?: string; focus?: string; bio?: string; url?: string; img?: string | null };
 
-function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | Logo)[] }) {
+function Rows({ kind, initial }: { kind: "people" | "logos" | "photos"; initial: (Person | Logo)[] }) {
   const [rows, setRows] = useState<Row[]>(() =>
     initial.map((r) =>
       kind === "people"
@@ -193,11 +202,11 @@ function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | 
       {rows.map((r, i) => (
         <div key={r.k} className="grid gap-3 rounded-xl border border-[#e8eeea] p-3 md:grid-cols-[150px_1fr]">
           <input type="hidden" name="row_key" value={r.k} />
-          <ImageField name={`row_${r.k}_img`} folder="pages" multiple={false} existing={r.img ? [r.img] : []} help={kind === "people" ? "Photo" : "Logo"} />
+          <ImageField name={`row_${r.k}_img`} folder="pages" multiple={false} existing={r.img ? [r.img] : []} help={kind === "logos" ? "Logo" : "Photo"} />
           <div className="flex flex-col gap-2">
             <div className="grid gap-2 sm:grid-cols-2">
-              <div><label className="a-label">{kind === "people" ? "Name" : "Organisation"}</label><input name="row_name" defaultValue={r.name} className="a-input" /></div>
-              {kind === "people" ? (
+              <div><label className="a-label">{kind === "people" ? "Name" : kind === "photos" ? "Label on the photo" : "Organisation"}</label><input name="row_name" defaultValue={r.name} placeholder={kind === "photos" ? "e.g. Production floor" : ""} className="a-input" /></div>
+              {kind === "photos" ? null : kind === "people" ? (
                 <div><label className="a-label">Role</label><input name="row_role" defaultValue={r.role} placeholder="e.g. Director · Finance" className="a-input" /></div>
               ) : (
                 <div><label className="a-label">Website (optional)</label><input name="row_url" defaultValue={r.url} placeholder="https://…" className="a-input" /></div>
@@ -221,7 +230,7 @@ function Rows({ kind, initial }: { kind: "people" | "logos"; initial: (Person | 
         </div>
       ))}
       <button type="button" className="a-btn-ghost self-start" onClick={() => setRows((x) => [...x, { k: key(), name: "", role: "", qual: "", focus: "", bio: "", url: "", img: null }])}>
-        + Add {kind === "people" ? "person" : "logo"}
+        + Add {kind === "people" ? "person" : kind === "photos" ? "photo" : "logo"}
       </button>
     </div>
   );
@@ -305,6 +314,34 @@ function FounderFields({ d }: { d: FounderData }) {
         <div><label className="a-label">Small line above the title</label><input name="eyebrow" defaultValue={d.eyebrow ?? ""} placeholder="e.g. The founder" className="a-input" /></div>
         <div><label className="a-label">Quote (optional)</label><textarea name="quote" rows={2} defaultValue={d.quote ?? ""} className="a-textarea" /></div>
         <div><label className="a-label">Story</label><textarea name="body" rows={7} defaultValue={d.body ?? ""} className="a-textarea" /><p className="a-help">{MD_HELP}</p></div>
+      </div>
+    </div>
+  );
+}
+
+/** Quality & Research → Inside Our Kochi Unit: the video, its caption, and the photo tiles beside it. */
+function UnitFields({ d }: { d: UnitData }) {
+  return (
+    <div className="flex flex-col gap-5">
+      <div><label className="a-label">Text under the heading</label><input name="text" defaultValue={d.text ?? ""} placeholder="Our own unit in Kadavanthra, Kochi, where every batch begins." className="a-input" /></div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div>
+          <p className="a-label">Video</p>
+          <VideoField name="video" initial={d.video ?? ""} />
+        </div>
+        <div className="flex flex-col gap-3">
+          <div>
+            <p className="a-label">Cover picture (optional)</p>
+            <ImageField name="poster" folder="pages" multiple={false} maxSide={1600} existing={d.poster ? [d.poster] : []} help="Shown before the video plays. Without one, an uploaded video shows its first frame and a YouTube video its own thumbnail." />
+          </div>
+          <div><label className="a-label">Video title</label><input name="videoTitle" defaultValue={d.videoTitle ?? ""} placeholder="Watch: a walk through our unit" className="a-input" /></div>
+          <div><label className="a-label">Video caption</label><input name="videoText" defaultValue={d.videoText ?? ""} placeholder="A short tour from raw material store to dispatch." className="a-input" /></div>
+        </div>
+      </div>
+      <div>
+        <p className="a-label">Photos beside the video</p>
+        <p className="a-help mb-2">The first four are shown beside the video; any more appear under “View all photos”.</p>
+        <Rows kind="photos" initial={(d.photos ?? []).map((p) => ({ name: p.label, url: "", image: p.image }))} />
       </div>
     </div>
   );

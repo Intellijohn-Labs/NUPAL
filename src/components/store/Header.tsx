@@ -83,12 +83,14 @@ export function Header({ concerns }: { concerns: Concern[]; types?: string[] }) 
 
         {/* right: rest of the menu (desktop), lens and bag */}
         <div className="flex items-center justify-end gap-1">
-          <nav aria-label="More" className="mr-3 hidden items-center gap-6 lg:flex xl:mr-5 xl:gap-9">
+          <nav aria-label="More" className="mr-3 hidden items-center gap-4 lg:flex xl:mr-5 xl:gap-9">
             <Link href="/consult" className={`${navLink} flex items-center gap-2 font-semibold text-forest`}>
               <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-[#3E8E4A] shadow-[0_0_0_3px_#DCEFDB]" />
-              Consult a Doctor
+              <span className="xl:hidden">Consult</span>
+              <span className="hidden xl:inline">Consult a Doctor</span>
             </Link>
             <Link href="/our-story" className={navLink}>Our Story</Link>
+            <Link href="/quality-research" className={navLink}><span className="2xl:hidden">Quality</span><span className="hidden 2xl:inline">Quality &amp; Research</span></Link>
           </nav>
           <button type="button" aria-label="Search" aria-expanded={panel === "search"} aria-controls="site-search-panel" onClick={() => toggle("search")} className={`${icon} ${panel === "search" ? "bg-[#F4F1E8]" : ""}`}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">
@@ -177,6 +179,7 @@ export function Header({ concerns }: { concerns: Concern[]; types?: string[] }) 
               Consult a Doctor
             </Link>
             <Link href="/our-story" className="block py-3.5">Our Story</Link>
+            <Link href="/quality-research" className="block py-3.5">Quality &amp; Research</Link>
           </div>
         </nav>
       )}

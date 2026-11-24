@@ -7,7 +7,7 @@ import { slugify } from "@/lib/format";
 import { str } from "@/lib/form";
 import { BLOCK_TYPES } from "@/lib/blocks";
 
-const DEFAULT_TITLE: Record<string, string> = { hero: "", founder: "Our story is written in our DNA", duo: "Vision & mission", intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
+const DEFAULT_TITLE: Record<string, string> = { hero: "", unit: "Inside Our Kochi Unit", certs: "Certified and Approved", founder: "Our story is written in our DNA", duo: "Vision & mission", intro: "Since [year]", stats: "", timeline: "Our journey", cards: "What we stand for", text: "", message: "Chairman’s Message", people: "Management", logos: "Our Associates", gallery: "Gallery" };
 
 async function refresh(pageId: string) {
   const page = await db.page.findUnique({ where: { id: pageId }, select: { slug: true } });
@@ -99,6 +99,19 @@ export async function saveBlock(id: string, f: FormData) {
     };
   } else if (b.type === "gallery") {
     data = { images: keep(f, "images") };
+  } else if (b.type === "certs") {
+    data = { pdf: str(f, "pdf") };
+  } else if (b.type === "unit") {
+    const keys = f.getAll("row_key").map(String);
+    const labels = f.getAll("row_name").map(String);
+    data = {
+      text: str(f, "text"),
+      video: str(f, "video"),
+      poster: keep(f, "poster")[0] ?? null,
+      videoTitle: str(f, "videoTitle"),
+      videoText: str(f, "videoText"),
+      photos: keys.map((k, i) => ({ label: labels[i]?.trim() ?? "", image: keep(f, `row_${k}_img`)[0] ?? null })).filter((p) => p.image),
+    };
   }
 
   await db.pageBlock.update({

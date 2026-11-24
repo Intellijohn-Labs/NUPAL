@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 export type Cert = { src: string; label: string };
 
 /** Our Story → quality section: small labelled certificate cards that open full size. */
-export function CertStrip({ certs }: { certs: Cert[] }) {
+export function CertStrip({ certs, listClassName }: { certs: Cert[]; listClassName?: string }) {
   const [open, setOpen] = useState<number | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
 
@@ -18,9 +18,9 @@ export function CertStrip({ certs }: { certs: Cert[] }) {
   const c = open === null ? null : certs[open];
   return (
     <>
-      <ul className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
+      <ul className={listClassName ?? "no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0"}>
         {certs.map((x, i) => (
-          <li key={x.src} className="w-[118px] shrink-0 sm:w-auto">
+          <li key={x.src} className={listClassName ? "" : "w-[118px] shrink-0 sm:w-auto"}>
             <button
               type="button"
               onClick={() => setOpen(i)}

@@ -65,6 +65,7 @@ export function Footer({ pages, settings, socials }: Props) {
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-[.14em] text-gold">Explore</h2>
           <ul className="grid gap-2 text-[15px] text-[#c9d4c8]">
             <li><Link href="/our-story" className="hover:text-white">Our Story</Link></li>
+            <li><Link href="/quality-research" className="hover:text-white">Quality &amp; Research</Link></li>
             <li><Link href="/stories" className="hover:text-white">Customer Experiences</Link></li>
             <li><Link href="/reviews" className="hover:text-white">Customer Reviews</Link></li>
             <li><Link href="/consult" className="hover:text-white">Consultation</Link></li>

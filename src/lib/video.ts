@@ -1,3 +1,7 @@
+/** Largest video Supabase Storage accepts on the current plan (admin uploads). */
+export const MAX_VIDEO_MB = 50;
+export const MAX_PDF_MB = 20;
+
 export type ParsedVideo = { kind: "youtube"; id: string } | { kind: "file"; url: string } | null;
 
 /** Accepts YouTube watch, youtu.be, Shorts and embed links, or a direct .mp4/.webm link. */

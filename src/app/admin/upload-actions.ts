@@ -3,6 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { currentUser } from "@/lib/auth";
 import { saveImage } from "@/lib/storage";
+import { MAX_PDF_MB, MAX_VIDEO_MB } from "@/lib/video";
 
 const FOLDERS = new Set(["products", "banners", "doctors", "testimonials", "results", "pages", "misc"]);
 const TYPES: Record<string, string> = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png", "image/svg+xml": "svg", "image/avif": "avif" };
@@ -44,6 +45,45 @@ export async function getUploadTargets(folder: string, types: string[]): Promise
     targets.push({ uploadUrl: `${s.url}/storage/v1${data.url}`, publicUrl: `${s.url}/storage/v1/object/public/${s.bucket}/${path}` });
   }
   return { mode: "supabase", targets };
+}
+
+const VIDEO_TYPES: Record<string, string> = { "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov" };
+
+/** One-time upload link for a video, which the browser sends straight to Supabase Storage (videos are too big for Vercel). */
+export async function getVideoUploadTarget(type: string, size: number): Promise<{ uploadUrl: string; publicUrl: string } | { error: string }> {
+  if (!(await currentUser())) return { error: "Please sign in again." };
+  const ext = VIDEO_TYPES[type];
+  if (!ext) return { error: "Please choose an MP4, WebM or MOV video." };
+  if (size > MAX_VIDEO_MB * 1024 * 1024) return { error: `Videos must be ${MAX_VIDEO_MB} MB or smaller. Shorten or compress it, or upload it to YouTube and paste the link instead.` };
+  const s = supa();
+  if (!s) return { error: "Video upload needs Supabase Storage. Paste a YouTube link instead." };
+  const path = `videos/${Date.now()}-${randomUUID().slice(0, 8)}.${ext}`;
+  const res = await fetch(`${s.url}/storage/v1/object/upload/sign/${s.bucket}/${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${s.key}`, apikey: s.key, "Content-Type": "application/json" },
+    body: "{}",
+  });
+  if (!res.ok) return { error: `Storage refused the upload (${res.status}).` };
+  const data = (await res.json()) as { url: string };
+  return { uploadUrl: `${s.url}/storage/v1${data.url}`, publicUrl: `${s.url}/storage/v1/object/public/${s.bucket}/${path}` };
+}
+
+/** One-time upload link for a PDF (e.g. the certificates file), sent straight from the browser to Supabase Storage. */
+export async function getPdfUploadTarget(type: string, size: number): Promise<{ uploadUrl: string; publicUrl: string } | { error: string }> {
+  if (!(await currentUser())) return { error: "Please sign in again." };
+  if (type !== "application/pdf") return { error: "Please choose a PDF file." };
+  if (size > MAX_PDF_MB * 1024 * 1024) return { error: `PDFs must be ${MAX_PDF_MB} MB or smaller.` };
+  const s = supa();
+  if (!s) return { error: "PDF upload needs Supabase Storage. Paste a link to the PDF instead." };
+  const path = `pages/${Date.now()}-${randomUUID().slice(0, 8)}.pdf`;
+  const res = await fetch(`${s.url}/storage/v1/object/upload/sign/${s.bucket}/${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${s.key}`, apikey: s.key, "Content-Type": "application/json" },
+    body: "{}",
+  });
+  if (!res.ok) return { error: `Storage refused the upload (${res.status}).` };
+  const data = (await res.json()) as { url: string };
+  return { uploadUrl: `${s.url}/storage/v1${data.url}`, publicUrl: `${s.url}/storage/v1/object/public/${s.bucket}/${path}` };
 }
 
 /** Fallback when Supabase Storage isn’t configured: one (already compressed) file per call. */

@@ -1,4 +1,4 @@
-export const BLOCK_TYPES = ["hero", "intro", "founder", "duo", "text", "stats", "timeline", "cards", "message", "people", "logos", "gallery"] as const;
+export const BLOCK_TYPES = ["hero", "intro", "founder", "duo", "text", "stats", "timeline", "cards", "message", "people", "logos", "gallery", "unit", "certs"] as const;
 
 export const BLOCK_LABELS: Record<string, { name: string; help: string }> = {
   hero: { name: "Story banner", help: "The full-screen green banner at the top of Our Story: small line, headline, text and two buttons" },
@@ -13,6 +13,8 @@ export const BLOCK_LABELS: Record<string, { name: string; help: string }> = {
   people: { name: "People", help: "Photo cards with name and role — e.g. Management" },
   logos: { name: "Logos", help: "A grid of logos — e.g. Our Associates" },
   gallery: { name: "Gallery", help: "Photos that open full size — e.g. certificates, CSR" },
+  certs: { name: "Certificates download", help: "Quality & Research: the PDF behind the “Download certificates (PDF)” button" },
+  unit: { name: "Kochi unit (video + photos)", help: "Quality & Research: a video tour of the unit with photo tiles beside it" },
 };
 
 /** Our Story banner. `headline`: one line per row; the last row is shown in cream. */
@@ -35,3 +37,7 @@ export type Logo = { image?: string | null; name: string; url: string };
 export type PeopleData = { people?: Person[] };
 export type LogosData = { logos?: Logo[] };
 export type GalleryData = { images?: string[] };
+/** Quality & Research → Certified and Approved: one PDF with all the certificates. */
+export type CertsData = { pdf?: string };
+/** Quality & Research → Inside Our Kochi Unit. `video`: an uploaded file or a YouTube link. */
+export type UnitData = { text?: string; video?: string; poster?: string | null; videoTitle?: string; videoText?: string; photos?: { image: string | null; label: string }[] };
