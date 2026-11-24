@@ -14,6 +14,11 @@ export const CONCERN_ICONS: Record<string, { label: string; d: string }> = {
   skin: { label: "Skin", d: "M12 21c-4 0-7-3-7-7 0-3 3-7 7-11 4 4 7 8 7 11 0 4-3 7-7 7z" },
   sleep: { label: "Sleep / stress", d: "M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z" },
   kids: { label: "Kids", d: "M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 22v-6l-2-4 4-2h8l4 2-2 4v6" },
+  kidney: { label: "Kidney / urinary", d: "M9 4C6 4 4 7 4 11s2 8 5 8c2 0 2.5-2 2-4-.4-1.5-2-2.5-2-4s1.6-2.5 2-4c.5-2-.5-3-2-3zM15 4c3 0 5 3 5 7s-2 8-5 8c-2 0-2.5-2-2-4 .4-1.5 2-2.5 2-4s-1.6-2.5-2-4c-.5-2 .5-3 2-3z" },
+  men: { label: "Men’s health", d: "M10 21a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM14.5 10.5L20 5M15 4h5v5" },
+  thyroid: { label: "Thyroid (butterfly)", d: "M12 7v12M12 9c-2-3-7-3-7 1 0 4 4 6 7 6M12 9c2-3 7-3 7 1 0 4-4 6-7 6" },
+  blood: { label: "Blood / haemoglobin", d: "M12 3c3 5 6 8 6 12a6 6 0 0 1-12 0c0-4 3-7 6-12zM9 15a3 3 0 0 0 3 3" },
+  wound: { label: "Wound healing (bandage)", d: "M4.5 14.5l10-10a3.5 3.5 0 0 1 5 5l-10 10a3.5 3.5 0 0 1-5-5zM9.5 9.5l5 5" },
   leaf: { label: "Leaf (general)", d: "M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l8-8" },
 };
 export const iconPath = (key: string) => (CONCERN_ICONS[key] ?? CONCERN_ICONS.leaf).d;
