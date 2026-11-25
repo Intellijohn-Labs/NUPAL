@@ -12,7 +12,7 @@ type Panel = "concerns" | "search" | "menu" | null;
 const POPULAR = ["Kamilari", "Hairomax", "Liver care", "Diawin", "Sumangaly"];
 
 const navLink =
-  "relative py-2 text-[12.5px] font-medium uppercase tracking-[.06em] text-ink whitespace-nowrap after:absolute after:inset-x-0 after:bottom-0.5 after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-forest after:transition-transform after:duration-300 hover:after:scale-x-100 xl:text-[13px]";
+  "relative py-2 text-[12px] font-medium uppercase tracking-[.04em] text-ink whitespace-nowrap after:absolute after:inset-x-0 after:bottom-0.5 after:h-[1.5px] after:origin-left after:scale-x-0 after:bg-forest after:transition-transform after:duration-300 hover:after:scale-x-100 xl:text-[13px] xl:tracking-[.06em]";
 
 /**
  * Header (approved mockup, Ujala-style): white bar, menu in small capitals split around a centred logo,
@@ -83,14 +83,14 @@ export function Header({ concerns }: { concerns: Concern[]; types?: string[] }) 
 
         {/* right: rest of the menu (desktop), lens and bag */}
         <div className="flex items-center justify-end gap-1">
-          <nav aria-label="More" className="mr-3 hidden items-center gap-4 lg:flex xl:mr-5 xl:gap-9">
+          <nav aria-label="More" className="mr-1 hidden items-center gap-3 lg:flex xl:mr-3 xl:gap-6 2xl:mr-5 2xl:gap-9">
             <Link href="/consult" className={`${navLink} flex items-center gap-2 font-semibold text-forest`}>
               <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-[#3E8E4A] shadow-[0_0_0_3px_#DCEFDB]" />
-              <span className="xl:hidden">Consult</span>
-              <span className="hidden xl:inline">Consult a Doctor</span>
+              <span className="min-[1400px]:hidden">Consult</span>
+              <span className="hidden min-[1400px]:inline">Consult a Doctor</span>
             </Link>
             <Link href="/our-story" className={navLink}>Our Story</Link>
-            <Link href="/quality-research" className={navLink}><span className="2xl:hidden">Quality</span><span className="hidden 2xl:inline">Quality &amp; Research</span></Link>
+            <Link href="/quality-research" className={navLink}>Quality &amp; Research</Link>
           </nav>
           <button type="button" aria-label="Search" aria-expanded={panel === "search"} aria-controls="site-search-panel" onClick={() => toggle("search")} className={`${icon} ${panel === "search" ? "bg-[#F4F1E8]" : ""}`}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true">

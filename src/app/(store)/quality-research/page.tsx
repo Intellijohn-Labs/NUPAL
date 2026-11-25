@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 const PROOF: [number, string, boolean][] = [
   [7, "Laboratory instruments", false],
   [5, "Core test types", false],
-  [3, "Quality certifications", false],
+  [4, "Quality certifications", false],
   [1960, "Making Ayurveda in Kochi", true],
 ];
 
@@ -90,7 +90,7 @@ const SERVICES = [
 const FAQS: [string, string][] = [
   ["Is every batch tested?", "Yes. Raw materials, in-process steps and finished medicines are checked at our own laboratory in Kochi."],
   ["Where are Nupal products made?", "At our own unit in Kadavanthra, Kochi, Kerala, where every batch begins."],
-  ["Are Nupal products GMP certified?", "Yes. We hold a GMP certificate from the Drugs Control Administration, Government of Kerala, and are WHO-GMP and ISO 9001:2015 certified."],
+  ["Are Nupal products GMP certified?", "Yes. We hold a GMP certificate from the Drugs Control Administration, Government of Kerala, are WHO-GMP and ISO 9001:2015 certified, and hold the AYUSH Quality Mark."],
   ["Can I see your certificates?", "Yes. Tap any certificate on this page to open it full size, or see them all on our Accreditations page."],
   ["Do you test for heavy metals and pesticides?", "Yes. Herbs and finished medicines are tested for heavy metals, pesticide residue and microbial contamination."],
 ];
@@ -99,9 +99,9 @@ const CERT_PICKS: [RegExp, string][] = [
   [/(^|[^o-])gmp-certificate/i, "GMP"],
   [/who-gmp/i, "WHO-GMP"],
   [/iso-9001/i, "ISO 9001"],
+  [/ayush-quality-mark/i, "Ayush"],
   [/moh-uae|uae/i, "UAE MoH"],
   [/malaysia/i, "Malaysia"],
-  [/mangolia|mongolia/i, "Mongolia"],
 ];
 
 function Svg({ d, className = "h-6 w-6" }: { d: string; className?: string }) {
@@ -377,6 +377,7 @@ export default async function QualityResearchPage() {
                 ["GMP", "GMP certificate", "Drugs Control Administration, Government of Kerala"],
                 ["WHO", "WHO-GMP certified", "Manufacturing quality to WHO guidelines"],
                 ["ISO", "ISO 9001:2015", "Quality management, certified by UKCERT"],
+                ["AQM", "AYUSH Quality Mark", "Granted by the Ayush Export Promotion Council (AYUSHEXCIL), supported by the Ministry of Ayush"],
                 ["AY", "Approved R&D laboratory", "Approvals and certifications from the Ministry of Ayush, Govt. of India"],
               ] as const).map(([seal, t, d], i) => (
                 <li key={t}>
