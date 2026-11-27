@@ -4,10 +4,26 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { inr } from "@/lib/format";
-import { placeOrder } from "@/app/(store)/checkout/actions";
+import { placeOrder, type PayuRedirect } from "@/app/(store)/checkout/actions";
 import { useCart } from "./CartProvider";
 
-type Props = { shippingFee: number; freeShippingAbove: number | null; codEnabled: boolean; codCharge: number };
+type Props = { shippingFee: number; freeShippingAbove: number | null; codEnabled: boolean; codCharge: number; onlineEnabled: boolean; notice?: string };
+
+/** Sends the browser to PayU’s payment page with the signed fields from the server. */
+function goToPayu(p: PayuRedirect) {
+  const f = document.createElement("form");
+  f.method = "POST";
+  f.action = p.action;
+  for (const [k, v] of Object.entries(p.fields)) {
+    const i = document.createElement("input");
+    i.type = "hidden";
+    i.name = k;
+    i.value = v;
+    f.appendChild(i);
+  }
+  document.body.appendChild(f);
+  f.submit();
+}
 
 const FIELDS = [
   { name: "customerName", label: "Full name", auto: "name", full: true },
@@ -19,13 +35,17 @@ const FIELDS = [
   { name: "pincode", label: "Pincode", auto: "postal-code", mode: "numeric" as const },
 ];
 
-export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCharge }: Props) {
+export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCharge, onlineEnabled, notice }: Props) {
   const { items, subtotal, clear, ready } = useCart();
   const router = useRouter();
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
+  const [pay, setPay] = useState<"online" | "cod">(onlineEnabled ? "online" : "cod");
+  const [redirecting, setRedirecting] = useState(false);
   const shipping = freeShippingAbove != null && subtotal >= freeShippingAbove ? 0 : shippingFee;
-  const total = subtotal + shipping + (codEnabled ? codCharge : 0);
+  const cod = pay === "cod" ? codCharge : 0;
+  const total = subtotal + shipping + cod;
+  const canOrder = pay === "online" ? onlineEnabled : codEnabled;
 
   if (ready && !items.length)
     return (
@@ -48,9 +68,15 @@ export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCh
         state: get("state"),
         pincode: get("pincode"),
         notes: get("notes"),
+        pay,
         items: items.map((i) => ({ variantId: i.variantId, qty: i.qty })),
       });
       if (!res.ok) return setError(res.error);
+      if (res.payu) {
+        // Keep the cart until PayU confirms the payment (cleared on the order page after success).
+        setRedirecting(true);
+        return goToPayu(res.payu);
+      }
       clear();
       router.push(`/order/${res.orderId}`);
     });
@@ -73,7 +99,7 @@ export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCh
                   inputMode={f.mode}
                   autoComplete={f.auto}
                   defaultValue={f.def}
-                  required={f.name !== "email"}
+                  required={f.name !== "email" || pay === "online"}
                   className="field"
                 />
               </div>
@@ -83,17 +109,26 @@ export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCh
               <textarea id="notes" name="notes" rows={2} className="field h-auto py-3" />
             </div>
           </fieldset>
-          <fieldset className="rounded-2xl border border-line p-5">
+          <fieldset className="flex flex-col gap-3 rounded-2xl border border-line p-5">
             <legend className="px-1 font-display text-xl">Payment</legend>
-            <label className="flex items-start gap-3 rounded-xl border border-sage bg-mist p-4">
-              <input type="radio" name="pay" defaultChecked className="mt-1 accent-[#567459]" />
-              <span>
-                <span className="block font-medium">Cash on delivery</span>
-                <span className="text-sm text-muted">
-                  Pay when your order arrives{codCharge ? ` (₹${codCharge} COD charge)` : ""}. Online payment (UPI, cards) is coming soon.
+            {onlineEnabled && (
+              <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${pay === "online" ? "border-sage bg-mist" : "border-line"}`}>
+                <input type="radio" name="pay" value="online" checked={pay === "online"} onChange={() => setPay("online")} className="mt-1 accent-[#567459]" />
+                <span>
+                  <span className="block font-medium">Pay online</span>
+                  <span className="text-sm text-muted">UPI, cards, net banking or wallets, through PayU’s secure page.</span>
                 </span>
-              </span>
-            </label>
+              </label>
+            )}
+            {codEnabled && (
+              <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${pay === "cod" ? "border-sage bg-mist" : "border-line"}`}>
+                <input type="radio" name="pay" value="cod" checked={pay === "cod"} onChange={() => setPay("cod")} className="mt-1 accent-[#567459]" />
+                <span>
+                  <span className="block font-medium">Cash on delivery</span>
+                  <span className="text-sm text-muted">Pay when your order arrives{codCharge ? ` (₹${codCharge} COD charge)` : ""}.</span>
+                </span>
+              </label>
+            )}
           </fieldset>
         </div>
         <aside className="flex flex-col gap-3 rounded-2xl bg-cream p-6">
@@ -109,13 +144,14 @@ export function CheckoutForm({ shippingFee, freeShippingAbove, codEnabled, codCh
           <div className="my-1 h-px bg-line" />
           <div className="flex justify-between"><span className="text-muted">Subtotal</span><span>{inr(subtotal)}</span></div>
           <div className="flex justify-between"><span className="text-muted">Delivery</span><span>{shipping === 0 ? "Free" : inr(shipping)}</span></div>
-          {codCharge > 0 && <div className="flex justify-between"><span className="text-muted">COD charge</span><span>{inr(codCharge)}</span></div>}
+          {cod > 0 && <div className="flex justify-between"><span className="text-muted">COD charge</span><span>{inr(cod)}</span></div>}
           <div className="flex items-baseline justify-between"><span className="text-lg font-medium">Total</span><span className="text-2xl font-semibold">{inr(total)}</span></div>
+          {notice && !error && <p role="status" className="rounded-lg bg-[#fbe6e0] px-3 py-2 text-sm text-[#a3361f]">{notice}</p>}
           {error && <p role="alert" className="rounded-lg bg-[#fbe6e0] px-3 py-2 text-sm text-[#a3361f]">{error}</p>}
-          <button type="submit" disabled={pending || !codEnabled} className="btn-primary mt-2 h-14 text-base">
-            {pending ? "Placing order…" : `Place order · ${inr(total)}`}
+          <button type="submit" disabled={pending || redirecting || !canOrder} className="btn-primary mt-2 h-14 text-base">
+            {redirecting ? "Opening secure payment…" : pending ? "Placing order…" : pay === "online" ? `Pay ${inr(total)}` : `Place order · ${inr(total)}`}
           </button>
-          {!codEnabled && <p className="text-sm text-[#a3361f]">Ordering is paused right now. Please contact us on WhatsApp.</p>}
+          {!codEnabled && !onlineEnabled && <p className="text-sm text-[#a3361f]">Ordering is paused right now. Please contact us on WhatsApp.</p>}
         </aside>
       </form>
     </div>

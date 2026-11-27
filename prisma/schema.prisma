@@ -115,6 +115,7 @@ enum PaymentMethod {
 enum PaymentStatus {
   PENDING
   PAID
+  FAILED
   REFUNDED
 }
 
@@ -135,6 +136,9 @@ model Order {
   paymentMethod PaymentMethod @default(COD)
   paymentStatus PaymentStatus @default(PENDING)
   status        OrderStatus   @default(NEW)
+  payuTxnId     String?       @unique // our transaction id sent to PayU (online orders)
+  paymentRef    String? // PayU payment id (mihpayid) once paid
+  paymentMode   String? // e.g. UPI, CC, NB, as reported by PayU
   notes         String?
   items         OrderItem[]
   createdAt     DateTime      @default(now())
